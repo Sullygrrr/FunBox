@@ -10,6 +10,8 @@ import {
   getCustomMinouQuestions,
 } from '../data/questionManager';
 import { PUNISHMENT_LEVELS } from '../types/punishments';
+import buttonSoundFile from '../assets/button-sound.mp3'; // Son du bouton
+
 
 interface MinouGameProps {
   players: Player[];
@@ -38,6 +40,14 @@ export default function MinouGame({ players, onEndGame, theme }: MinouGameProps)
       : players;
     return availablePlayers[Math.floor(Math.random() * availablePlayers.length)];
   }, [players]);
+
+  const buttonSound = new Audio(buttonSoundFile);
+
+  // Fonction pour jouer le son du bouton
+  const playButtonSound = () => {
+    buttonSound.currentTime = 0; // Redémarre le son au début
+    buttonSound.play();
+  };
 
   const processQuestion = useCallback((question: string) => {
     let processedQuestion = question;
@@ -209,7 +219,9 @@ export default function MinouGame({ players, onEndGame, theme }: MinouGameProps)
               Fin du jeu
             </button>
             <button
-              onClick={startNewQuestion}
+              onClick={() => {
+                startNewQuestion();
+              playButtonSound()}}
               className={`flex-1 flex items-center justify-center gap-2 text-white py-3 rounded-lg transition-colors ${theme.primary} ${theme.hover}`}
             >
               Question suivante
@@ -312,7 +324,8 @@ export default function MinouGame({ players, onEndGame, theme }: MinouGameProps)
                 {players.map((player) => (
                   <button
                     key={player.name}
-                    onClick={() => handleVote(player)}
+                    onClick={() => {handleVote(player);
+                    playButtonSound()}}
                     className="flex flex-col items-center gap-2 p-4 rounded-xl bg-white shadow-sm hover:shadow-md transition-all"
                   >
                     <div
@@ -327,7 +340,8 @@ export default function MinouGame({ players, onEndGame, theme }: MinouGameProps)
           ) : (
             <div className="text-center">
               <button
-                onClick={() => setShowResults(true)}
+                onClick={() => {setShowResults(true);
+                playButtonSound()}}
                 className={`flex items-center justify-center gap-2 mx-auto px-8 py-3 text-white rounded-lg transition-colors ${theme.primary} ${theme.hover}`}
               >
                 <Eye className="w-5 h-5" />
