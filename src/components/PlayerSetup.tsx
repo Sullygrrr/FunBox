@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Beer, Dumbbell, Wine } from 'lucide-react';
 import { Player } from '../types';
 import { Theme } from '../types/theme';
+import buttonSoundFile from '../assets/button-sound.mp3'; // Son du bouton
+
 
 const COLORS = [
   '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6',
@@ -27,6 +29,13 @@ export default function PlayerSetup({ onAdd, onCancel, usedColors, usedNames, th
   const [color, setColor] = useState(COLORS.find(c => !usedColors.includes(c)) || COLORS[0]);
   const [punishment, setPunishment] = useState<'shots' | 'verre' | 'pompes'>('shots');
   const [error, setError] = useState('');
+
+  const buttonSound = new Audio(buttonSoundFile);
+
+  const playButtonSound = () => {
+    buttonSound.currentTime = 0; // Redémarre le son au début
+    buttonSound.play();
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,7 +91,8 @@ export default function PlayerSetup({ onAdd, onCancel, usedColors, usedNames, th
             <button
               key={c}
               type="button"
-              onClick={() => setColor(c)}
+              onClick={() => {setColor(c);
+              playButtonSound()}}
               className={`w-8 h-8 rounded-full transition-all hover:scale-110 ${
                 color === c ? `scale-110 ring-2 ring-offset-2 ${theme.ring}` : ''
               }`}
@@ -101,7 +111,8 @@ export default function PlayerSetup({ onAdd, onCancel, usedColors, usedNames, th
             <button
               key={value}
               type="button"
-              onClick={() => setPunishment(value as 'shots' | 'verre' | 'pompes')}
+              onClick={() => {setPunishment(value as 'shots' | 'verre' | 'pompes');
+            playButtonSound()}}
               className={`flex flex-col items-center gap-2 p-3 rounded-lg transition-all hover:scale-105 ${
                 punishment === value 
                   ? `${theme.primary} text-white ring-2 ${theme.ring} ring-offset-2`
