@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { ArrowRight, Home, RotateCw } from 'lucide-react';
 import { Player } from '../types';
 import { Theme } from '../types/theme';
+import buttonSoundFile from '../assets/spin-wheel.mp3'; // Son du bouton
+
 
 interface WheelGameProps {
   players: Player[];
@@ -12,6 +14,13 @@ interface WheelGameProps {
 export default function WheelGame({ players, onEndGame, theme }: WheelGameProps) {
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
+  const buttonSound = new Audio(buttonSoundFile);
+
+  // Fonction pour jouer le son du bouton
+  const playButtonSound = () => {
+    buttonSound.currentTime = 0; // Redémarre le son au début
+    buttonSound.play();
+  };
 
   const spinWheel = () => {
     setIsSpinning(true);
@@ -66,7 +75,8 @@ export default function WheelGame({ players, onEndGame, theme }: WheelGameProps)
             End Game
           </button>
           <button
-            onClick={spinWheel}
+            onClick={() => {spinWheel();
+              playButtonSound()}}
             disabled={isSpinning}
             className={`flex-1 flex items-center justify-center gap-2 text-white py-3 rounded-lg transition-colors ${theme.primary} ${theme.hover} disabled:opacity-50`}
           >

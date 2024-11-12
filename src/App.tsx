@@ -121,13 +121,6 @@ export default function App() {
           ))}
         </div>
       </div>
-      <button
-          onClick={() => {toggleMute();
-            playButtonSound()}}
-          className={`absolute bottom-4 right-4 text-white p-2 rounded-full ${theme.primary} ${theme.hover}`}
-        >
-          {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
-        </button>
       <div className="container mx-auto px-4 py-8 max-w-lg relative">
         <header className="text-center mb-8">
           <h1 className="text-5xl font-bold text-white mb-2 font-display tracking-wider animate-shimmer bg-clip-text text-transparent bg-gradient-to-r from-white via-amber-200 to-white bg-[length:200%_100%]">
@@ -160,7 +153,13 @@ export default function App() {
                   theme={theme}
                 />
               )}
-
+      <button
+          onClick={() => {toggleMute();
+            playButtonSound()}}
+            className={`fixed bottom-2 right-2 text-white p-2 rounded-full ${theme.primary} ${theme.hover} z-20`}
+        >
+          {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+        </button>
               {players.length > 0 ? (
                 <div className="grid grid-cols-1 gap-3 mb-6">
                   {players.map((player, index) => (

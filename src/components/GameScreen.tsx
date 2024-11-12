@@ -6,6 +6,8 @@ import { getRandomPunishmentLevel } from '../utils/punishments';
 import { Theme } from '../types/theme';
 import { QuestionDisplay } from './GameScreen/QuestionDisplay';
 import QuestionManager from './QuestionManager';
+import buttonSoundFile from '../assets/button-sound.mp3'; // Son du bouton
+
 
 interface GameScreenProps {
   players: Player[];
@@ -20,6 +22,13 @@ export default function GameScreen({ players, onEndGame, theme }: GameScreenProp
     punishment: ReturnType<typeof getRandomPunishmentLevel>;
   } | null>(null);
   const [usedQuestions, setUsedQuestions] = useState<string[]>([]);
+  const buttonSound = new Audio(buttonSoundFile);
+
+  // Fonction pour jouer le son du bouton
+  const playButtonSound = () => {
+    buttonSound.currentTime = 0; // Redémarre le son au début
+    buttonSound.play();
+  };
 
   const getRandomPlayer = useCallback((excludePlayer?: Player) => {
     const availablePlayers = excludePlayer 
@@ -131,7 +140,8 @@ export default function GameScreen({ players, onEndGame, theme }: GameScreenProp
             Fin du jeu
           </button>
           <button
-            onClick={nextQuestion}
+            onClick={() => {nextQuestion();
+              playButtonSound()}}
             className={`flex-1 flex items-center justify-center gap-2 text-white py-3 rounded-lg transition-colors ${theme.primary} ${theme.hover}`}
           >
             Question suivante
