@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Eye, EyeOff } from 'lucide-react';
 import { 
   defaultQuestions,
@@ -19,8 +19,15 @@ interface QuestionManagerProps {
 export default function QuestionManager({ theme, mode }: QuestionManagerProps) {
   const [newQuestion, setNewQuestion] = useState('');
   const [customQuestions, setCustomQuestions] = useState(getCustomQuestions());
-  const [disabledQuestions, setDisabledQuestions] = useState(getDisabledDefaultQuestions());
+  const [disabledQuestions, setDisabledQuestions] = useState<number[]>(() => {
+    const saved = localStorage.getItem('disabledDefaultQuestions');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [activeTab, setActiveTab] = useState<'default' | 'custom'>('default');
+
+  useEffect(() => {
+    localStorage.setItem('disabledDefaultQuestions', JSON.stringify(disabledQuestions));
+  }, [disabledQuestions]);
 
   const handleAddQuestion = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,11 +44,13 @@ export default function QuestionManager({ theme, mode }: QuestionManagerProps) {
   };
 
   const handleToggleDefaultQuestion = (index: number) => {
-    const isEnabled = toggleDefaultQuestion(index);
-    setDisabledQuestions(isEnabled 
+    const isDisabled = disabledQuestions.includes(index);
+    const updatedDisabled = isDisabled
       ? disabledQuestions.filter(i => i !== index)
-      : [...disabledQuestions, index]
-    );
+      : [...disabledQuestions, index];
+    
+    setDisabledQuestions(updatedDisabled);
+    toggleDefaultQuestion(index);
   };
 
   return (
