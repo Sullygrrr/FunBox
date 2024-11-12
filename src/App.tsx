@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PlusCircle, Settings } from 'lucide-react';
+import { PlusCircle, Settings, Volume2, VolumeX } from 'lucide-react'; // Import icons for mute/unmute
 import { ScreenOrientation } from '@capacitor/screen-orientation';
 import PlayerSetup from './components/PlayerSetup';
 import GameScreen from './components/GameScreen';
@@ -19,7 +19,8 @@ export default function App() {
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [gameMode, setGameMode] = useState<GameMode | null>(null);
-  const [audioPlayed, setAudioPlayed] = useState(false); // État pour vérifier si la musique a été jouée
+  const [audioPlayed, setAudioPlayed] = useState(false);
+  const [isMuted, setIsMuted] = useState(false); // État pour le mute/unmute
 
   useEffect(() => {
     const lockOrientation = async () => {
@@ -37,6 +38,7 @@ export default function App() {
     if (audioPlayed) {
       const audio = new Audio(musique);
       audio.loop = true;
+      audio.volume = isMuted ? 0 : 1; // Volume dépend de l'état mute
 
       audio.play().catch((error) => {
         console.log('Erreur lors de la lecture de la musique de fond :', error);
@@ -47,7 +49,7 @@ export default function App() {
         audio.currentTime = 0;
       };
     }
-  }, [audioPlayed]); // Dépend de audioPlayed pour démarrer la musique
+  }, [audioPlayed, isMuted]); // Redémarrer la musique en cas de changement du mute
 
   // Créer un objet audio pour le son du bouton
   const buttonSound = new Audio(buttonSoundFile);
@@ -58,21 +60,25 @@ export default function App() {
     buttonSound.play();
   };
 
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+  };
+
   const addPlayer = (player: Player) => {
     setPlayers([...players, player]);
     setShowAddPlayer(false);
-    playButtonSound(); // Joue le son lors de l'ajout d'un joueur
+    playButtonSound();
   };
 
   const removePlayer = (index: number) => {
     setPlayers(players.filter((_, i) => i !== index));
-    playButtonSound(); // Joue le son lors de la suppression d'un joueur
+    playButtonSound();
   };
 
   const startGame = (mode: GameMode) => {
     setGameMode(mode);
     setGameStarted(true);
-    playButtonSound(); // Joue le son lors du début du jeu
+    playButtonSound();
   };
 
   const renderGame = () => {
@@ -91,9 +97,8 @@ export default function App() {
   const usedColors = players.map(p => p.color);
   const usedNames = players.map(p => p.name);
 
-  // Fonction pour lancer la musique après une interaction
   const handleUserInteraction = () => {
-    setAudioPlayed(true); // Change l'état pour jouer la musique après interaction
+    setAudioPlayed(true);
   };
 
   return (
@@ -123,6 +128,14 @@ export default function App() {
             FunBox
           </h1>
         </header>
+
+        <button
+          onClick={() => {toggleMute();
+            playButtonSound()}}
+          className={`absolute top-9 right-9 text-white p-2 rounded-full ${theme.primary} ${theme.hover}`}
+        >
+          {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
+        </button>
 
         {!gameStarted ? (
           <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-6">
