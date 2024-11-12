@@ -121,22 +121,19 @@ export default function App() {
           ))}
         </div>
       </div>
-
+      <button
+          onClick={() => {toggleMute();
+            playButtonSound()}}
+          className={`absolute bottom-9 right-9 text-white p-2 rounded-full ${theme.primary} ${theme.hover}`}
+        >
+          {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
+        </button>
       <div className="container mx-auto px-4 py-8 max-w-lg relative">
         <header className="text-center mb-8">
           <h1 className="text-5xl font-bold text-white mb-2 font-display tracking-wider animate-shimmer bg-clip-text text-transparent bg-gradient-to-r from-white via-amber-200 to-white bg-[length:200%_100%]">
             FunBox
           </h1>
         </header>
-
-        <button
-          onClick={() => {toggleMute();
-            playButtonSound()}}
-          className={`absolute top-9 right-9 text-white p-2 rounded-full ${theme.primary} ${theme.hover}`}
-        >
-          {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
-        </button>
-
         {!gameStarted ? (
           <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-6">
             <div className="mb-6">
