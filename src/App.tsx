@@ -124,7 +124,7 @@ export default function App() {
       <button
           onClick={() => {toggleMute();
             playButtonSound()}}
-          className={`absolute bottom-9 right-9 text-white p-2 rounded-full ${theme.primary} ${theme.hover}`}
+          className={`absolute bottom-4 right-4 text-white p-2 rounded-full ${theme.primary} ${theme.hover}`}
         >
           {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
         </button>
