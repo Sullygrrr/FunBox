@@ -19,6 +19,7 @@ export default function App() {
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [gameMode, setGameMode] = useState<GameMode | null>(null);
+  const [audioPlayed, setAudioPlayed] = useState(false); // État pour vérifier si la musique a été jouée
 
   useEffect(() => {
     const lockOrientation = async () => {
@@ -31,21 +32,22 @@ export default function App() {
     lockOrientation();
   }, []);
 
-  // Musique de fond en boucle avec gestion de promesse pour éviter l'erreur d'autoplay
+  // Musique de fond en boucle, jouée après l'interaction utilisateur
   useEffect(() => {
-    const audio = new Audio(musique);
-    audio.loop = true;
+    if (audioPlayed) {
+      const audio = new Audio(musique);
+      audio.loop = true;
 
-    // Tentative de lecture de la musique
-    audio.play().catch((error) => {
-      console.log('Erreur lors de la lecture de la musique de fond :', error);
-    });
+      audio.play().catch((error) => {
+        console.log('Erreur lors de la lecture de la musique de fond :', error);
+      });
 
-    return () => {
-      audio.pause();
-      audio.currentTime = 0;
-    };
-  }, []);
+      return () => {
+        audio.pause();
+        audio.currentTime = 0;
+      };
+    }
+  }, [audioPlayed]); // Dépend de audioPlayed pour démarrer la musique
 
   // Créer un objet audio pour le son du bouton
   const buttonSound = new Audio(buttonSoundFile);
@@ -89,8 +91,13 @@ export default function App() {
   const usedColors = players.map(p => p.color);
   const usedNames = players.map(p => p.name);
 
+  // Fonction pour lancer la musique après une interaction
+  const handleUserInteraction = () => {
+    setAudioPlayed(true); // Change l'état pour jouer la musique après interaction
+  };
+
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${theme.gradient} relative overflow-hidden`}>
+    <div className={`min-h-screen bg-gradient-to-br ${theme.gradient} relative overflow-hidden`} onClick={handleUserInteraction}>
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 animate-scroll-diagonal">
           {Array.from({ length: 12 }).map((_, i) => (
