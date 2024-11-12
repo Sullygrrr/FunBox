@@ -131,12 +131,6 @@ export default function App() {
                 <h2 className="text-2xl font-semibold text-gray-800">Joueurs</h2>
                 <div className="flex gap-2">
                   <button
-                    onClick={() => { setShowSettings(!showSettings); playButtonSound(); }}
-                    className={`p-2 rounded-lg transition-colors ${showSettings ? theme.primary + ' text-white' : 'text-gray-500 hover:bg-gray-100'}`}
-                  >
-                    <Settings className="w-5 h-5" />
-                  </button>
-                  <button
                     onClick={() => { setShowAddPlayer(true); playButtonSound(); }}
                     className={`flex items-center gap-2 text-white px-4 py-2 rounded-lg transition-colors ${theme.primary} ${theme.hover}`}
                     disabled={players.length >= 8}
