@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PlusCircle, Settings } from 'lucide-react';
 import { ScreenOrientation } from '@capacitor/screen-orientation';
 import PlayerSetup from './components/PlayerSetup';
@@ -19,10 +19,6 @@ export default function App() {
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [gameMode, setGameMode] = useState<GameMode | null>(null);
-  const [isMusicPlaying, setIsMusicPlaying] = useState(false); // Ajout d'état pour suivre si la musique est jouée
-
-  const audioRef = useRef(new Audio(musique)); // Créer une référence à l'objet Audio
-  const buttonSound = useRef(new Audio(buttonSoundFile)); // Son du bouton
 
   useEffect(() => {
     const lockOrientation = async () => {
@@ -35,16 +31,26 @@ export default function App() {
     lockOrientation();
   }, []);
 
-  const playMusic = () => {
-    if (!isMusicPlaying) {
-      audioRef.current.loop = true;
-      audioRef.current.play().catch((error) => {
-        console.log('Erreur lors de la lecture de la musique de fond :', error);
-      });
-      setIsMusicPlaying(true);
-    }
-  };
+  // Musique de fond en boucle avec gestion de promesse pour éviter l'erreur d'autoplay
+  useEffect(() => {
+    const audio = new Audio(musique);
+    audio.loop = true;
 
+    // Tentative de lecture de la musique
+    audio.play().catch((error) => {
+      console.log('Erreur lors de la lecture de la musique de fond :', error);
+    });
+
+    return () => {
+      audio.pause();
+      audio.currentTime = 0;
+    };
+  }, []);
+
+  // Créer un objet audio pour le son du bouton
+  const buttonSound = new Audio(buttonSoundFile);
+
+  // Fonction pour jouer le son du bouton
   const playButtonSound = () => {
     buttonSound.currentTime = 0; // Redémarre le son au début
     buttonSound.play();
@@ -110,15 +116,6 @@ export default function App() {
             FunBox
           </h1>
         </header>
-
-        {/* Bouton pour démarrer la musique */}
-        {!isMusicPlaying && (
-          <div className="text-center mb-4">
-            <button onClick={playMusic} className="bg-blue-500 text-white px-4 py-2 rounded">
-              Démarrer la musique
-            </button>
-          </div>
-        )}
 
         {!gameStarted ? (
           <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-6">
