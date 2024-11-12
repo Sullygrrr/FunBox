@@ -10,7 +10,7 @@ export default defineConfig({
       manifest: {
         name: 'FunBox',
         short_name: 'FunBox',
-        description: 'Le jeu qui met l\'ambiance !',
+        description: 'Parcequ\'il faut bien boire !',
         theme_color: '#f59e0b',
         icons: [
           {
