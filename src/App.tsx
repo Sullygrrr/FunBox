@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PlusCircle, Settings, Volume2, VolumeX } from 'lucide-react'; // Import icons for mute/unmute
+import { PlusCircle, Settings, Volume2, VolumeX } from 'lucide-react';
 import { ScreenOrientation } from '@capacitor/screen-orientation';
 import PlayerSetup from './components/PlayerSetup';
 import GameScreen from './components/GameScreen';
@@ -9,8 +9,8 @@ import GameModeSelector from './components/GameModeSelector';
 import QuestionManager from './components/QuestionManager';
 import { useTheme } from './hooks/useTheme';
 import { Player, GameMode } from './types';
-import musique from './assets/musique.mp3'; // Musique de fond
-import buttonSoundFile from './assets/button-sound.mp3'; // Son du bouton
+import musique from './assets/musique.mp3';
+import buttonSoundFile from './assets/button-sound.mp3';
 
 export default function App() {
   const theme = useTheme();
@@ -20,7 +20,7 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [gameMode, setGameMode] = useState<GameMode | null>(null);
   const [audioPlayed, setAudioPlayed] = useState(false);
-  const [isMuted, setIsMuted] = useState(false); // État pour le mute/unmute
+  const [isMuted, setIsMuted] = useState(false);
 
   useEffect(() => {
     const lockOrientation = async () => {
@@ -33,12 +33,11 @@ export default function App() {
     lockOrientation();
   }, []);
 
-  // Musique de fond en boucle, jouée après l'interaction utilisateur
   useEffect(() => {
     if (audioPlayed) {
       const audio = new Audio(musique);
       audio.loop = true;
-      audio.volume = isMuted ? 0 : 1; // Volume dépend de l'état mute
+      audio.volume = isMuted ? 0 : 1;
 
       audio.play().catch((error) => {
         console.log('Erreur lors de la lecture de la musique de fond :', error);
@@ -49,14 +48,12 @@ export default function App() {
         audio.currentTime = 0;
       };
     }
-  }, [audioPlayed, isMuted]); // Redémarrer la musique en cas de changement du mute
+  }, [audioPlayed, isMuted]);
 
-  // Créer un objet audio pour le son du bouton
   const buttonSound = new Audio(buttonSoundFile);
 
-  // Fonction pour jouer le son du bouton
   const playButtonSound = () => {
-    buttonSound.currentTime = 0; // Redémarre le son au début
+    buttonSound.currentTime = 0;
     buttonSound.play();
   };
 
@@ -153,13 +150,13 @@ export default function App() {
                   theme={theme}
                 />
               )}
-      <button
-          onClick={() => {toggleMute();
-            playButtonSound()}}
-            className={`fixed bottom-2 right-2 text-white p-2 rounded-full ${theme.primary} ${theme.hover} z-20`}
-        >
-          {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
-        </button>
+              <button
+                onClick={() => {toggleMute();
+                  playButtonSound()}}
+                className={`fixed bottom-2 right-2 text-white p-2 rounded-full ${theme.primary} ${theme.hover} z-20`}
+              >
+                {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+              </button>
               {players.length > 0 ? (
                 <div className="grid grid-cols-1 gap-3 mb-6">
                   {players.map((player, index) => (
@@ -208,6 +205,15 @@ export default function App() {
           renderGame()
         )}
       </div>
+      <footer className="fixed bottom-0 left-0 right-0 py-8 px-4">
+        <div className="container mx-auto flex justify-center items-center gap-4 text-xs text-white/70">
+          <a href="https://www.instagram.com/sully.grrr/" className="hover:text-white transition-colors">@Sully.grrr</a>
+          <span>•</span>
+          <a href="https://www.paypal.me/lafunbox" className="hover:text-white transition-colors">Soutenir le dev</a>
+          <span>•</span>
+          <a href="https://fr.wikipedia.org/wiki/Fun" className="hover:text-white transition-colors">Fun</a>
+        </div>
+      </footer>
     </div>
   );
 }
