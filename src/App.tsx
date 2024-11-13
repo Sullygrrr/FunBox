@@ -5,6 +5,7 @@ import PlayerSetup from './components/PlayerSetup';
 import GameScreen from './components/GameScreen';
 import WheelGame from './components/WheelGame';
 import MinouGame from './components/MinouGame';
+import MimeGame from './components/MimeGame';
 import GameModeSelector from './components/GameModeSelector';
 import QuestionManager from './components/QuestionManager';
 import { useTheme } from './hooks/useTheme';
@@ -45,7 +46,6 @@ export default function App() {
         console.log('Erreur lors de la lecture de la musique de fond :', error);
       });
 
-      // Gestion de la visibilité de la page
       const handleVisibilityChange = () => {
         if (document.hidden) {
           audio.pause();
@@ -105,6 +105,8 @@ export default function App() {
         return <GameScreen players={players} onEndGame={() => setGameStarted(false)} theme={theme} />;
       case 'minou':
         return <MinouGame players={players} onEndGame={() => setGameStarted(false)} theme={theme} />;
+      case 'mime':
+        return <MimeGame players={players} onEndGame={() => setGameStarted(false)} theme={theme} />;
       case 'wheel':
         return <WheelGame players={players} onEndGame={() => setGameStarted(false)} theme={theme} />;
       default:

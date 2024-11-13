@@ -3,9 +3,10 @@ export interface Player {
   color: string;
   punishment: 'shots' | 'verre' | 'pompes';
   amount: number;
+  points?: number;
 }
 
-export type GameMode = 'simple' | 'minou' | 'wheel';
+export type GameMode = 'simple' | 'minou' | 'mime' | 'wheel';
 
 export interface GameModeOption {
   id: GameMode;
@@ -13,3 +14,12 @@ export interface GameModeOption {
   emoji: string;
   description: string;
 }
+
+export interface Team {
+  id: number;
+  name: string;
+  players: Player[];
+  points: number;
+}
+
+export type TimeLimit = 30 | 45 | 60 | 90;

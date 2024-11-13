@@ -14,6 +14,12 @@ export const gameModes: GameModeOption[] = [
     description: 'Votez secrètement pour vos amis'
   },
   {
+    id: 'mime',
+    title: 'Mime Time',
+    emoji: '🤹',
+    description: 'Fais deviner sans parler !'
+  },
+  {
     id: 'wheel',
     title: 'La rouuuue !',
     emoji: '💀',
