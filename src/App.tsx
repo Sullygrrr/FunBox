@@ -255,7 +255,7 @@ export default function App() {
           renderGame()
         )}
       </div>
-      <footer className="fixed bottom-0 left-0 right-0 py-8 px-4">
+      <footer className="fixed bottom-0 left-0 right-0 py-4 px-4">
         <div className="container mx-auto flex justify-center items-center gap-4 text-xs text-white/70">
           <a href="https://www.instagram.com/sully.grrr/" className="hover:text-white transition-colors">@Sully.grrr</a>
           <span>•</span>
