@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Eye, EyeOff, Send } from 'lucide-react';
+import { Plus, Trash2, Send } from 'lucide-react';
 import { 
   defaultQuestions,
   getCustomQuestions, 
@@ -135,27 +135,21 @@ export default function QuestionManager({ theme, mode }: QuestionManagerProps) {
       <div className="space-y-2 max-h-[400px] overflow-y-auto">
         {activeTab === 'default' ? (
           defaultQuestions.map((question, index) => (
-            <div key={index} className="flex items-center justify-between bg-white p-2 rounded-md">
-              <span className="text-sm text-gray-700 flex-1 mr-2">{question}</span>
-              <button
-                onClick={() => handleToggleDefaultQuestion(index)}
-                className={`p-1 transition-colors ${
-                  disabledQuestions.includes(index) 
-                    ? 'text-gray-400 hover:text-gray-600' 
-                    : `${theme.primary} text-white`
-                }`}
-              >
-                {disabledQuestions.includes(index) ? (
-                  <EyeOff className="w-4 h-4" />
-                ) : (
-                  <Eye className="w-4 h-4" />
-                )}
-              </button>
-            </div>
+            <button
+              key={index}
+              onClick={() => handleToggleDefaultQuestion(index)}
+              className={`w-full text-left p-4 rounded-lg transition-all hover:scale-[1.02] ${
+                disabledQuestions.includes(index)
+                  ? 'bg-gray-100 text-gray-400'
+                  : `${theme.primary} text-white hover:bg-opacity-90`
+              }`}
+            >
+              <span className="text-sm">{question}</span>
+            </button>
           ))
         ) : (
           customQuestions.map((question, index) => (
-            <div key={index} className="flex items-center justify-between bg-white p-2 rounded-md">
+            <div key={index} className="flex items-center justify-between bg-white p-4 rounded-lg">
               <span className="text-sm text-gray-700 flex-1 mr-2">{question}</span>
               <button
                 onClick={() => handleRemoveCustomQuestion(index)}

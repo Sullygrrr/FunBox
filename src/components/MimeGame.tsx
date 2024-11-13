@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { Home, RefreshCw, Timer, Trophy, Users, ArrowRight, Check, X } from 'lucide-react';
+import React, { useState, useCallback, useEffect } from 'react';
+import { PlusCircle, Settings, Home, Timer, Trophy, ArrowRight, Check, X } from 'lucide-react';
 import { Player, Team, TimeLimit } from '../types';
 import { Theme } from '../types/theme';
-import { mimeWords } from '../data/mimeWords';
+import { getAllMimeWords } from '../data/mimeWords';
 import { generateTeamName } from '../data/teamNames';
+import MimeWordManager from './MimeWordManager';
 import buttonSoundFile from '../assets/button-sound.mp3';
 
 interface MimeGameProps {
@@ -21,16 +22,24 @@ export default function MimeGame({ players, onEndGame, theme }: MimeGameProps) {
   const [timeLeft, setTimeLeft] = useState(timeLimit);
   const [currentTeamIndex, setCurrentTeamIndex] = useState(0);
   const [currentMimer, setCurrentMimer] = useState<Player | null>(null);
+  const [selectedMimer, setSelectedMimer] = useState<Player | null>(null);
   const [roundNumber, setRoundNumber] = useState(1);
   const [currentWords, setCurrentWords] = useState<{ word: string; guessed: boolean; skipped: boolean }[]>([]);
   const [usedWords, setUsedWords] = useState<string[]>([]);
   const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
+
   const buttonSound = new Audio(buttonSoundFile);
 
   const playButtonSound = () => {
     buttonSound.currentTime = 0;
     buttonSound.play();
   };
+
+  const getRandomPlayer = useCallback(() => {
+    const randomPlayer = players[Math.floor(Math.random() * players.length)];
+    return randomPlayer.name;
+  }, [players]);
 
   const shuffleTeams = () => {
     const shuffledPlayers = [...players].sort(() => Math.random() - 0.5);
@@ -50,10 +59,11 @@ export default function MimeGame({ players, onEndGame, theme }: MimeGameProps) {
   };
 
   const getRandomWords = (count: number) => {
-    const availableWords = mimeWords.filter(word => !usedWords.includes(word));
+    const allWords = getAllMimeWords(getRandomPlayer);
+    const availableWords = allWords.filter(word => !usedWords.includes(word));
     if (availableWords.length < count) {
       setUsedWords([]);
-      return mimeWords
+      return allWords
         .sort(() => Math.random() - 0.5)
         .slice(0, count)
         .map(word => ({ word, guessed: false, skipped: false }));
@@ -65,17 +75,11 @@ export default function MimeGame({ players, onEndGame, theme }: MimeGameProps) {
   };
 
   const startTeamTurn = () => {
-    const currentTeam = teams[currentTeamIndex];
-    const usedMimers = currentTeam.players.filter(p => p.points && p.points > 0);
-    const availableMimers = currentTeam.players.filter(p => !usedMimers.includes(p));
+    if (!selectedMimer) return;
     
-    const nextMimer = availableMimers.length > 0
-      ? availableMimers[Math.floor(Math.random() * availableMimers.length)]
-      : currentTeam.players[Math.floor(Math.random() * currentTeam.players.length)];
-    
-    setCurrentMimer(nextMimer);
     setTimeLeft(timeLimit);
     setCurrentWords(getRandomWords(10));
+    setCurrentMimer(selectedMimer);
     
     const newTimer = setInterval(() => {
       setTimeLeft(prev => {
@@ -89,6 +93,18 @@ export default function MimeGame({ players, onEndGame, theme }: MimeGameProps) {
     
     setTimer(newTimer);
     setGamePhase('playing');
+  };
+
+  const selectNextMimer = () => {
+    const currentTeam = teams[currentTeamIndex];
+    const usedMimers = currentTeam.players.filter(p => p.points && p.points > 0);
+    const availableMimers = currentTeam.players.filter(p => !usedMimers.includes(p));
+    
+    const nextMimer = availableMimers.length > 0
+      ? availableMimers[Math.floor(Math.random() * availableMimers.length)]
+      : currentTeam.players[Math.floor(Math.random() * currentTeam.players.length)];
+    
+    setSelectedMimer(nextMimer);
   };
 
   const getCurrentWord = () => {
@@ -170,165 +186,184 @@ export default function MimeGame({ players, onEndGame, theme }: MimeGameProps) {
     };
   }, [timer]);
 
+  useEffect(() => {
+    if (gamePhase === 'between-teams') {
+      selectNextMimer();
+    }
+  }, [currentTeamIndex, gamePhase]);
+
   if (gamePhase === 'setup') {
     return (
       <div className="max-w-3xl mx-auto">
         <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-8">
-          {isTeamMode === null ? (
-            <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-center mb-8">Mode de jeu</h2>
-              <div className="grid grid-cols-1 gap-4">
-                <button
-                  onClick={() => {
-                    setIsTeamMode(true);
-                    playButtonSound();
-                  }}
-                  className={`p-6 rounded-lg ${theme.primary} text-white hover:opacity-90 transition-all ${
-                    players.length < 4 ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
-                  disabled={players.length < 4}
-                >
-                  <Users className="w-12 h-12 mx-auto mb-4" />
-                  <span className="text-lg font-medium">Par équipes</span>
-                  {players.length < 4 && (
-                    <p className="text-sm mt-2">Minimum 4 joueurs requis</p>
-                  )}
-                </button>
-              </div>
-              <button
-                onClick={onEndGame}
-                className="w-full mt-4 flex items-center justify-center gap-2 px-6 py-3 border rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <Home className="w-5 h-5" />
-                Retour au menu
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-center mb-8">Configuration</h2>
-              
-              <div className="space-y-4">
-                <label className="block text-sm font-medium text-gray-700">
-                  Nombre d'équipes
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {[2, 3, 4].map(num => {
-                    const minPlayersRequired = num * 2;
-                    const isDisabled = players.length < minPlayersRequired;
-                    
-                    return (
-                      <button
-                        key={num}
-                        onClick={() => {
-                          setNumberOfTeams(num);
-                          playButtonSound();
-                        }}
-                        disabled={isDisabled}
-                        className={`p-4 rounded-lg ${
-                          numberOfTeams === num
-                            ? `${theme.primary} text-white`
-                            : 'bg-gray-100 text-gray-800'
-                        } ${
-                          isDisabled
-                            ? 'opacity-50 cursor-not-allowed'
-                            : 'hover:opacity-90'
-                        } transition-all`}
-                      >
-                        {num}
-                        {isDisabled && (
-                          <p className="text-xs mt-1">
-                            Min {minPlayersRequired} joueurs
-                          </p>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold">Configuration</h2>
+            <button
+              onClick={() => setShowSettings(!showSettings)}
+              className="p-2 text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              <Settings className="w-5 h-5" />
+            </button>
+          </div>
 
-              <div className="space-y-4">
-                <label className="block text-sm font-medium text-gray-700">
-                  Temps par manche
-                </label>
-                <div className="grid grid-cols-4 gap-2">
-                  {[60, 90, 120, 180].map(time => (
+          {showSettings ? (
+            <MimeWordManager theme={theme} />
+          ) : (
+            <>
+              {isTeamMode === null ? (
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 gap-4">
                     <button
-                      key={time}
                       onClick={() => {
-                        setTimeLimit(time as TimeLimit);
+                        setIsTeamMode(true);
                         playButtonSound();
                       }}
-                      className={`p-4 rounded-lg ${
-                        timeLimit === time
-                          ? `${theme.primary} text-white`
-                          : 'bg-gray-100 text-gray-800'
-                      } hover:opacity-90 transition-all`}
+                      className={`p-6 rounded-lg ${theme.primary} text-white hover:opacity-90 transition-all ${
+                        players.length < 4 ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
+                      disabled={players.length < 4}
                     >
-                      {time/60}min
+                      <PlusCircle className="w-12 h-12 mx-auto mb-4" />
+                      <span className="text-lg font-medium">Par équipes</span>
+                      {players.length < 4 && (
+                        <p className="text-sm mt-2">Minimum 4 joueurs requis</p>
+                      )}
                     </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <button
-                  onClick={() => {
-                    shuffleTeams();
-                    playButtonSound();
-                  }}
-                  className="w-full p-4 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
-                >
-                  <RefreshCw className="w-5 h-5" />
-                  Mélanger les équipes
-                </button>
-
-                {teams.length > 0 && (
-                  <div className="grid grid-cols-2 gap-4">
-                    {teams.map(team => (
-                      <div key={team.id} className="p-4 rounded-lg bg-gray-50">
-                        <h3 className="font-medium mb-2">{team.name}</h3>
-                        <ul className="space-y-1">
-                          {team.players.map(player => (
-                            <li
-                              key={player.name}
-                              className="text-sm"
-                              style={{ color: player.color }}
-                            >
-                              {player.name}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
                   </div>
-                )}
-              </div>
+                  <button
+                    onClick={onEndGame}
+                    className="w-full mt-4 flex items-center justify-center gap-2 px-6 py-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <Home className="w-5 h-5" />
+                    Retour au menu
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <div className="space-y-4">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Nombre d'équipes
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[2, 3, 4].map(num => {
+                        const minPlayersRequired = num * 2;
+                        const isDisabled = players.length < minPlayersRequired;
+                        
+                        return (
+                          <button
+                            key={num}
+                            onClick={() => {
+                              setNumberOfTeams(num);
+                              playButtonSound();
+                            }}
+                            disabled={isDisabled}
+                            className={`p-4 rounded-lg ${
+                              numberOfTeams === num
+                                ? `${theme.primary} text-white`
+                                : 'bg-gray-100 text-gray-800'
+                            } ${
+                              isDisabled
+                                ? 'opacity-50 cursor-not-allowed'
+                                : 'hover:opacity-90'
+                            } transition-all`}
+                          >
+                            {num}
+                            {isDisabled && (
+                              <p className="text-xs mt-1">
+                                Min {minPlayersRequired} joueurs
+                              </p>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
 
-              <div className="flex gap-4">
-                <button
-                  onClick={() => {
-                    setIsTeamMode(null);
-                    setTeams([]);
-                  }}
-                  className="flex items-center gap-2 px-6 py-3 border rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <Home className="w-5 h-5" />
-                  Retour
-                </button>
-                <button
-                  onClick={() => {
-                    if (teams.length === 0) {
-                      shuffleTeams();
-                    }
-                    setGamePhase('between-teams');
-                    playButtonSound();
-                  }}
-                  className={`flex-1 flex items-center justify-center gap-2 text-white py-3 rounded-lg transition-colors ${theme.primary} ${theme.hover}`}
-                >
-                  Commencer
-                </button>
-              </div>
-            </div>
+                  <div className="space-y-4">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Temps par manche
+                    </label>
+                    <div className="grid grid-cols-4 gap-2">
+                      {[30, 45, 60, 90].map(time => (
+                        <button
+                          key={time}
+                          onClick={() => {
+                            setTimeLimit(time as TimeLimit);
+                            playButtonSound();
+                          }}
+                          className={`p-4 rounded-lg ${
+                            timeLimit === time
+                              ? `${theme.primary} text-white`
+                              : 'bg-gray-100 text-gray-800'
+                          } hover:opacity-90 transition-all`}
+                        >
+                          {time}s
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <button
+                      onClick={() => {
+                        shuffleTeams();
+                        playButtonSound();
+                      }}
+                      className="w-full p-4 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <ArrowRight className="w-5 h-5" />
+                      Mélanger les équipes
+                    </button>
+
+                    {teams.length > 0 && (
+                      <div className="grid grid-cols-2 gap-4">
+                        {teams.map(team => (
+                          <div key={team.id} className="p-4 rounded-lg bg-gray-50">
+                            <h3 className="font-medium mb-2">{team.name}</h3>
+                            <ul className="space-y-1">
+                              {team.players.map(player => (
+                                <li
+                                  key={player.name}
+                                  className="text-sm"
+                                  style={{ color: player.color }}
+                                >
+                                  {player.name}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex gap-4">
+                    <button
+                      onClick={() => {
+                        setIsTeamMode(null);
+                        setTeams([]);
+                      }}
+                      className="flex items-center gap-2 px-6 py-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      <Home className="w-5 h-5" />
+                      Retour
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (teams.length === 0) {
+                          shuffleTeams();
+                        }
+                        setGamePhase('between-teams');
+                        playButtonSound();
+                      }}
+                      className={`flex-1 flex items-center justify-center gap-2 text-white py-3 rounded-lg transition-colors ${theme.primary} ${theme.hover}`}
+                    >
+                      Commencer
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -397,7 +432,6 @@ export default function MimeGame({ players, onEndGame, theme }: MimeGameProps) {
 
   if (gamePhase === 'between-teams') {
     const nextTeam = teams[currentTeamIndex];
-    const nextMimer = nextTeam.players[Math.floor(Math.random() * nextTeam.players.length)];
     
     return (
       <div className="max-w-3xl mx-auto">
@@ -420,20 +454,21 @@ export default function MimeGame({ players, onEndGame, theme }: MimeGameProps) {
               </div>
             </div>
 
-            <div className="text-center p-4 bg-gray-50 rounded-lg">
-              <p className="text-lg mb-2">C'est au tour de</p>
-              <div
-                className="w-16 h-16 rounded-full mx-auto mb-2"
-                style={{ backgroundColor: nextMimer.color }}
-              />
-              <p className="font-bold text-xl">{nextMimer.name}</p>
-              <p className="text-gray-600">de faire deviner !</p>
-            </div>
+            {selectedMimer && (
+              <div className="text-center p-4 bg-gray-50 rounded-lg">
+                <p className="text-lg mb-2">C'est au tour de</p>
+                <div
+                  className="w-16 h-16 rounded-full mx-auto mb-2"
+                  style={{ backgroundColor: selectedMimer.color }}
+                />
+                <p className="font-bold text-xl">{selectedMimer.name}</p>
+                <p className="text-gray-600">de faire deviner !</p>
+              </div>
+            )}
           </div>
 
           <button
             onClick={() => {
-              setCurrentMimer(nextMimer);
               startTeamTurn();
               playButtonSound();
             }}
@@ -494,7 +529,7 @@ export default function MimeGame({ players, onEndGame, theme }: MimeGameProps) {
               }}
               className={`flex-1 flex items-center justify-center gap-2 text-white py-3 rounded-lg transition-colors ${theme.primary} ${theme.hover}`}
             >
-              <RefreshCw className="w-5 h-5" />
+              <ArrowRight className="w-5 h-5" />
               Nouveau tour
             </button>
           </div>
@@ -557,6 +592,7 @@ export default function MimeGame({ players, onEndGame, theme }: MimeGameProps) {
                 setRoundNumber(1);
                 setUsedWords([]);
                 setCurrentMimer(null);
+                setSelectedMimer(null);
                 setTeams([]);
                 playButtonSound();
               }}
