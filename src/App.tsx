@@ -8,13 +8,16 @@ import MinouGame from './components/MinouGame';
 import MimeGame from './components/MimeGame';
 import GameModeSelector from './components/GameModeSelector';
 import QuestionManager from './components/QuestionManager';
+import SafetyPopup from './components/SafetyPopup';
 import { useTheme } from './hooks/useTheme';
+import { useSafetyPopup } from './hooks/useSafetyPopup';
 import { Player, GameMode } from './types';
 import musique from './assets/musique.mp3';
 import buttonSoundFile from './assets/button-sound.mp3';
 
 export default function App() {
   const theme = useTheme();
+  const { showPopup, closePopup } = useSafetyPopup();
   const [players, setPlayers] = useState<Player[]>([]);
   const [gameStarted, setGameStarted] = useState(false);
   const [showAddPlayer, setShowAddPlayer] = useState(false);
@@ -142,6 +145,7 @@ export default function App() {
 
   return (
     <div className={`min-h-screen bg-gradient-to-br ${theme.gradient} relative overflow-hidden`} onClick={handleUserInteraction}>
+      {showPopup && <SafetyPopup onClose={closePopup} theme={theme} />}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 animate-scroll-diagonal">
           {Array.from({ length: 12 }).map((_, i) => (
