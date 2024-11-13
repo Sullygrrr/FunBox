@@ -1,10 +1,10 @@
 import emailjs from 'emailjs-com';
 
-export const sendQuestionSuggestionEmail = async (question: string, gameMode: string) => {
+export const sendQuestionSuggestionEmail = async (questions: string, gameMode: string) => {
     try {
         const templateParams = {
-          subject: `Suggestion de joueur - ${gameMode}`,
-          message: `Un utilisateur a soumis cette question, on valide chef ?\n\n${question}`,
+          subject: `Suggestions de questions - ${gameMode}`,
+          message: `Un utilisateur a soumis ces questions, on valide chef ?\n\n${questions}`,
           to_email: 'sully@lafunbox.fun'
         };
 

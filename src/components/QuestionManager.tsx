@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Eye, EyeOff } from 'lucide-react';
+import { Plus, Trash2, Eye, EyeOff, Send } from 'lucide-react';
 import { 
   defaultQuestions,
   getCustomQuestions, 
@@ -25,22 +25,17 @@ export default function QuestionManager({ theme, mode }: QuestionManagerProps) {
     return saved ? JSON.parse(saved) : [];
   });
   const [activeTab, setActiveTab] = useState<'default' | 'custom'>('default');
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('disabledDefaultQuestions', JSON.stringify(disabledQuestions));
   }, [disabledQuestions]);
 
-  const handleAddQuestion = async (e: React.FormEvent) => {
+  const handleAddQuestion = (e: React.FormEvent) => {
     e.preventDefault();
     if (newQuestion.trim()) {
       const updatedQuestions = addCustomQuestion(newQuestion.trim());
       setCustomQuestions(updatedQuestions);
-      
-      const gameModeText = mode === 'simple' ? 'Simple Basique' : 
-                          mode === 'minou' ? 'Par Minou' : 
-                          mode === 'wheel' ? 'La Roue' : 'Mode Inconnu';
-      
-      await sendQuestionSuggestionEmail(newQuestion.trim(), gameModeText);
       setNewQuestion('');
     }
   };
@@ -58,6 +53,25 @@ export default function QuestionManager({ theme, mode }: QuestionManagerProps) {
     
     setDisabledQuestions(updatedDisabled);
     toggleDefaultQuestion(index);
+  };
+
+  const handleSubmitQuestions = async () => {
+    if (customQuestions.length === 0) return;
+    
+    setSubmitting(true);
+    try {
+      const gameModeText = mode === 'simple' ? 'Simple Basique' : 
+                          mode === 'minou' ? 'Par Minou' : 
+                          mode === 'wheel' ? 'La Roue' : 'Mode Inconnu';
+      
+      await sendQuestionSuggestionEmail(customQuestions.join('\n\n'), gameModeText);
+      alert('Questions soumises avec succès !');
+    } catch (error) {
+      console.error('Error submitting questions:', error);
+      alert('Erreur lors de la soumission des questions');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -86,21 +100,36 @@ export default function QuestionManager({ theme, mode }: QuestionManagerProps) {
       </div>
 
       {activeTab === 'custom' && (
-        <form onSubmit={handleAddQuestion} className="flex gap-2 mb-4">
-          <input
-            type="text"
-            value={newQuestion}
-            onChange={(e) => setNewQuestion(e.target.value)}
-            placeholder="Ajouter une question (utilise @joueur pour un joueur aléatoire)"
-            className={`flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${theme.ring}`}
-          />
-          <button
-            type="submit"
-            className={`p-2 text-white rounded-md transition-colors ${theme.primary} ${theme.hover}`}
-          >
-            <Plus className="w-5 h-5" />
-          </button>
-        </form>
+        <>
+          <form onSubmit={handleAddQuestion} className="flex gap-2 mb-4">
+            <input
+              type="text"
+              value={newQuestion}
+              onChange={(e) => setNewQuestion(e.target.value)}
+              placeholder="Ajouter une question (utilise @joueur pour un joueur aléatoire)"
+              className={`flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${theme.ring}`}
+            />
+            <button
+              type="submit"
+              className={`p-2 text-white rounded-md transition-colors ${theme.primary} ${theme.hover}`}
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+          </form>
+
+          {customQuestions.length > 0 && (
+            <div className="flex justify-end mb-4">
+              <button
+                onClick={handleSubmitQuestions}
+                disabled={submitting}
+                className={`flex items-center gap-2 px-4 py-2 text-white rounded-md transition-colors ${theme.primary} ${theme.hover} disabled:opacity-50`}
+              >
+                <Send className="w-4 h-4" />
+                {submitting ? 'Envoi...' : 'Soumettre les questions au créateur'}
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       <div className="space-y-2 max-h-[400px] overflow-y-auto">
