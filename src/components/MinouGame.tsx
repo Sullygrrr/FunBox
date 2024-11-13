@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Home, Eye, Settings, Plus, Trash2 } from 'lucide-react';
+import { Home, Eye, Settings, Plus, Trash2, Send } from 'lucide-react';
 import { Player } from '../types';
 import { Theme } from '../types/theme';
 import { defaultMinouQuestions } from '../data/minouQuestions';
@@ -10,8 +10,8 @@ import {
   getCustomMinouQuestions,
 } from '../data/questionManager';
 import { PUNISHMENT_LEVELS } from '../types/punishments';
-import buttonSoundFile from '../assets/button-sound.mp3'; // Son du bouton
-
+import buttonSoundFile from '../assets/button-sound.mp3';
+import { sendQuestionSuggestionEmail } from '../utils/email';
 
 interface MinouGameProps {
   players: Player[];
@@ -33,6 +33,7 @@ export default function MinouGame({ players, onEndGame, theme }: MinouGameProps)
   const [showSettings, setShowSettings] = useState(false);
   const [newQuestion, setNewQuestion] = useState('');
   const [customQuestions, setCustomQuestions] = useState(getCustomMinouQuestions());
+  const [submitting, setSubmitting] = useState(false);
 
   const getRandomPlayer = useCallback((excludePlayer?: Player) => {
     const availablePlayers = excludePlayer 
@@ -43,9 +44,8 @@ export default function MinouGame({ players, onEndGame, theme }: MinouGameProps)
 
   const buttonSound = new Audio(buttonSoundFile);
 
-  // Fonction pour jouer le son du bouton
   const playButtonSound = () => {
-    buttonSound.currentTime = 0; // Redémarre le son au début
+    buttonSound.currentTime = 0;
     buttonSound.play();
   };
 
@@ -138,6 +138,21 @@ export default function MinouGame({ players, onEndGame, theme }: MinouGameProps)
     setCustomQuestions(updatedQuestions);
   };
 
+  const handleSubmitQuestions = async () => {
+    if (customQuestions.length === 0) return;
+    
+    setSubmitting(true);
+    try {
+      await sendQuestionSuggestionEmail(customQuestions.join('\n\n'), 'Mode Par Minou');
+      alert('Questions soumises avec succès !');
+    } catch (error) {
+      console.error('Error submitting questions:', error);
+      alert('Erreur lors de la soumission des questions');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const getPunishmentLevel = () => {
     return PUNISHMENT_LEVELS[Math.floor(Math.random() * 3) + 3];
   };
@@ -221,7 +236,8 @@ export default function MinouGame({ players, onEndGame, theme }: MinouGameProps)
             <button
               onClick={() => {
                 startNewQuestion();
-              playButtonSound()}}
+                playButtonSound();
+              }}
               className={`flex-1 flex items-center justify-center gap-2 text-white py-3 rounded-lg transition-colors ${theme.primary} ${theme.hover}`}
             >
               Question suivante
@@ -253,7 +269,7 @@ export default function MinouGame({ players, onEndGame, theme }: MinouGameProps)
                 value={newQuestion}
                 onChange={(e) => setNewQuestion(e.target.value)}
                 placeholder="Ajouter une nouvelle question... (@joueur pour un joueur aléatoire)"
-                className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+                className={`flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 ${theme.ring}`}
               />
               <button
                 type="submit"
@@ -263,6 +279,19 @@ export default function MinouGame({ players, onEndGame, theme }: MinouGameProps)
               </button>
             </div>
           </form>
+
+          {customQuestions.length > 0 && (
+            <div className="flex justify-end mb-4">
+              <button
+                onClick={handleSubmitQuestions}
+                disabled={submitting}
+                className={`flex items-center gap-2 px-4 py-2 text-white rounded-md transition-colors ${theme.primary} ${theme.hover} disabled:opacity-50`}
+              >
+                <Send className="w-4 h-4" />
+                {submitting ? 'Envoi...' : 'Soumettre les questions au créateur'}
+              </button>
+            </div>
+          )}
 
           <div className="space-y-4">
             <div>
@@ -324,8 +353,10 @@ export default function MinouGame({ players, onEndGame, theme }: MinouGameProps)
                 {players.map((player) => (
                   <button
                     key={player.name}
-                    onClick={() => {handleVote(player);
-                    playButtonSound()}}
+                    onClick={() => {
+                      handleVote(player);
+                      playButtonSound();
+                    }}
                     className="flex flex-col items-center gap-2 p-4 rounded-xl bg-white shadow-sm hover:shadow-md transition-all"
                   >
                     <div
@@ -340,8 +371,10 @@ export default function MinouGame({ players, onEndGame, theme }: MinouGameProps)
           ) : (
             <div className="text-center">
               <button
-                onClick={() => {setShowResults(true);
-                playButtonSound()}}
+                onClick={() => {
+                  setShowResults(true);
+                  playButtonSound();
+                }}
                 className={`flex items-center justify-center gap-2 mx-auto px-8 py-3 text-white rounded-lg transition-colors ${theme.primary} ${theme.hover}`}
               >
                 <Eye className="w-5 h-5" />
