@@ -23,6 +23,8 @@ export default function App() {
   const [audioPlayed, setAudioPlayed] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
+  const [clickCount, setClickCount] = useState(0);
+  const [lastClickTime, setLastClickTime] = useState(0);
 
   useEffect(() => {
     const lockOrientation = async () => {
@@ -63,6 +65,23 @@ export default function App() {
       };
     }
   }, [audioPlayed, isMuted]);
+
+  const handleHeaderClick = () => {
+    const currentTime = new Date().getTime();
+    const timeDiff = currentTime - lastClickTime;
+    
+    if (timeDiff < 500) { // 500ms between clicks
+      setClickCount(prev => prev + 1);
+      if (clickCount === 2) { // This will be the third click
+        const mailtoLink = "mailto:sully@lafunbox.fun?subject=Message depuis la FunBox&body=On joue à la FunBox et on t'envoie ce message en direct de notre soirée (hesitez pas à mettre des photos :) Merci à vous !!!)";
+        window.location.href = mailtoLink;
+        setClickCount(0);
+      }
+    } else {
+      setClickCount(1);
+    }
+    setLastClickTime(currentTime);
+  };
 
   const buttonSound = new Audio(buttonSoundFile);
 
@@ -143,7 +162,10 @@ export default function App() {
       </div>
       <div className="container mx-auto px-4 py-8 max-w-lg relative">
         <header className="text-center mb-8">
-          <h1 className="text-5xl font-bold text-white mb-2 font-display tracking-wider animate-shimmer bg-clip-text text-transparent bg-gradient-to-r from-white via-amber-200 to-white bg-[length:200%_100%]">
+          <h1 
+            className="text-5xl font-bold text-white mb-2 font-display tracking-wider animate-shimmer bg-clip-text text-transparent bg-gradient-to-r from-white via-amber-200 to-white bg-[length:200%_100%] cursor-pointer"
+            onClick={handleHeaderClick}
+          >
             FunBox
           </h1>
         </header>
