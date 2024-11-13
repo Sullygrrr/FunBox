@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { PlusCircle, Settings, Home, Timer, Trophy, ArrowRight, Check, X } from 'lucide-react';
+import { PlusCircle, Settings, Home, Timer, Trophy, ArrowRight, Check, X, Users, User } from 'lucide-react';
 import { Player, Team, TimeLimit } from '../types';
 import { Theme } from '../types/theme';
 import { getAllMimeWords } from '../data/mimeWords';
@@ -298,7 +298,7 @@ export default function MimeGame({ players, onEndGame, theme }: MimeGameProps) {
                       }`}
                       disabled={players.length < 4}
                     >
-                      <PlusCircle className="w-12 h-12 mx-auto mb-4" />
+                      <Users className="w-12 h-12 mx-auto mb-4" />
                       <span className="text-lg font-medium">Par équipes</span>
                       {players.length < 4 && (
                         <p className="text-sm mt-2">Minimum 4 joueurs requis</p>
@@ -315,7 +315,7 @@ export default function MimeGame({ players, onEndGame, theme }: MimeGameProps) {
                       }`}
                       disabled={players.length < 3}
                     >
-                      <PlusCircle className="w-12 h-12 mx-auto mb-4" />
+                      <User className="w-12 h-12 mx-auto mb-4" />
                       <span className="text-lg font-medium">Mode Solo</span>
                       {players.length < 3 && (
                         <p className="text-sm mt-2">Minimum 3 joueurs requis</p>
@@ -378,60 +378,43 @@ export default function MimeGame({ players, onEndGame, theme }: MimeGameProps) {
                       Temps par manche
                     </label>
                     <div className="grid grid-cols-4 gap-2">
-                      {[30, 45, 60, 90].map(time => (
-                        <button
-                          key={time}
-                          onClick={() => {
-                            setTimeLimit(time as TimeLimit);
-                            playButtonSound();
-                          }}
-                          className={`p-4 rounded-lg ${
-                            timeLimit === time
-                              ? `${theme.primary} text-white`
-                              : 'bg-gray-100 text-gray-800'
-                          } hover:opacity-90 transition-all`}
-                        >
-                          {time}s
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {isTeamMode && (
-                    <div className="space-y-4">
-                      <button
-                        onClick={() => {
-                          shuffleTeams();
-                          playButtonSound();
-                        }}
-                        className="w-full p-4 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
-                      >
-                        <ArrowRight className="w-5 h-5" />
-                        Mélanger les équipes
-                      </button>
-
-                      {teams.length > 0 && (
-                        <div className="grid grid-cols-2 gap-4">
-                          {teams.map(team => (
-                            <div key={team.id} className="p-4 rounded-lg bg-gray-50">
-                              <h3 className="font-medium mb-2">{team.name}</h3>
-                              <ul className="space-y-1">
-                                {team.players.map(player => (
-                                  <li
-                                    key={player.name}
-                                    className="text-sm"
-                                    style={{ color: player.color }}
-                                  >
-                                    {player.name}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          ))}
-                        </div>
+                      {isTeamMode ? (
+                        [60, 90, 120, 180].map(time => (
+                          <button
+                            key={time}
+                            onClick={() => {
+                              setTimeLimit(time as TimeLimit);
+                              playButtonSound();
+                            }}
+                            className={`p-4 rounded-lg ${
+                              timeLimit === time
+                                ? `${theme.primary} text-white`
+                                : 'bg-gray-100 text-gray-800'
+                            } hover:opacity-90 transition-all`}
+                          >
+                            {time >= 60 ? `${time/60}min` : `${time}s`}
+                          </button>
+                        ))
+                      ) : (
+                        [30, 45, 60, 90].map(time => (
+                          <button
+                            key={time}
+                            onClick={() => {
+                              setTimeLimit(time as TimeLimit);
+                              playButtonSound();
+                            }}
+                            className={`p-4 rounded-lg ${
+                              timeLimit === time
+                                ? `${theme.primary} text-white`
+                                : 'bg-gray-100 text-gray-800'
+                            } hover:opacity-90 transition-all`}
+                          >
+                            {time >= 60 ? `${time/60}min` : `${time}s`}
+                          </button>
+                        ))
                       )}
                     </div>
-                  )}
+                  </div>
 
                   <div className="flex gap-4">
                     <button
@@ -743,7 +726,7 @@ export default function MimeGame({ players, onEndGame, theme }: MimeGameProps) {
   if (gamePhase === 'results') {
     const sortedPlayers = isTeamMode
       ? [...teams].sort((a, b) => b.points - a.points)
-      : [...soloPlayers].sort((a, b) => b.points - a.points);
+      : [...soloPlayers].sort((a, b) => (b.points || 0) - (a.points || 0));
 
     const winner = sortedPlayers[0];
     
@@ -793,7 +776,7 @@ export default function MimeGame({ players, onEndGame, theme }: MimeGameProps) {
             >
               <Home className="w-5 h-5" />
               Fin du jeu
-            </button>
+            </button> ```jsx
             <button
               onClick={() => {
                 setGamePhase('setup');

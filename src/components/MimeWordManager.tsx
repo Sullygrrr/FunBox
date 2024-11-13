@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Send } from 'lucide-react';
 import { Theme } from '../types/theme';
 import { 
   defaultMimeWords,
@@ -9,6 +9,7 @@ import {
   getDisabledDefaultMimeWords,
   toggleDefaultMimeWord
 } from '../data/mimeWords';
+import { sendQuestionSuggestionEmail } from '../utils/email';
 
 interface MimeWordManagerProps {
   theme: Theme;
@@ -19,6 +20,7 @@ export default function MimeWordManager({ theme }: MimeWordManagerProps) {
   const [customWords, setCustomWords] = useState(getCustomMimeWords());
   const [disabledWords, setDisabledWords] = useState(getDisabledDefaultMimeWords());
   const [activeTab, setActiveTab] = useState<'default' | 'custom'>('default');
+  const [submitting, setSubmitting] = useState(false);
 
   const handleAddWord = (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,6 +44,21 @@ export default function MimeWordManager({ theme }: MimeWordManagerProps) {
     
     setDisabledWords(updatedDisabled);
     toggleDefaultMimeWord(index);
+  };
+
+  const handleSubmitWords = async () => {
+    if (customWords.length === 0) return;
+    
+    setSubmitting(true);
+    try {
+      await sendQuestionSuggestionEmail(customWords.join('\n\n'), 'Mode Mime');
+      alert('Mots soumis avec succès !');
+    } catch (error) {
+      console.error('Error submitting words:', error);
+      alert('Erreur lors de la soumission des mots');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -70,21 +87,36 @@ export default function MimeWordManager({ theme }: MimeWordManagerProps) {
       </div>
 
       {activeTab === 'custom' && (
-        <form onSubmit={handleAddWord} className="flex gap-2 mb-4">
-          <input
-            type="text"
-            value={newWord}
-            onChange={(e) => setNewWord(e.target.value)}
-            placeholder="Ajouter un mot ou une phrase à mimer"
-            className={`flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${theme.ring}`}
-          />
-          <button
-            type="submit"
-            className={`p-2 text-white rounded-md transition-colors ${theme.primary} ${theme.hover}`}
-          >
-            <Plus className="w-5 h-5" />
-          </button>
-        </form>
+        <>
+          <form onSubmit={handleAddWord} className="flex gap-2 mb-4">
+            <input
+              type="text"
+              value={newWord}
+              onChange={(e) => setNewWord(e.target.value)}
+              placeholder="Ajouter un mot ou une phrase à mimer"
+              className={`flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${theme.ring}`}
+            />
+            <button
+              type="submit"
+              className={`p-2 text-white rounded-md transition-colors ${theme.primary} ${theme.hover}`}
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+          </form>
+
+          {customWords.length > 0 && (
+            <div className="flex justify-end mb-4">
+              <button
+                onClick={handleSubmitWords}
+                disabled={submitting}
+                className={`flex items-center gap-2 px-4 py-2 text-white rounded-md transition-colors ${theme.primary} ${theme.hover} disabled:opacity-50`}
+              >
+                <Send className="w-4 h-4" />
+                {submitting ? 'Envoi...' : 'Soumettre les mots au créateur'}
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       <div className="space-y-2 max-h-[400px] overflow-y-auto">

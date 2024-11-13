@@ -22,4 +22,4 @@ export interface Team {
   points: number;
 }
 
-export type TimeLimit = 30 | 45 | 60 | 90;
+export type TimeLimit = 30 | 45 | 60 | 90 | 120 | 180;
