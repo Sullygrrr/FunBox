@@ -10,6 +10,7 @@ import {
 } from '../data/questions';
 import { Theme } from '../types/theme';
 import { GameMode } from '../types';
+import { sendQuestionSuggestionEmail } from '../utils/email';
 
 interface QuestionManagerProps {
   theme: Theme;
@@ -29,11 +30,17 @@ export default function QuestionManager({ theme, mode }: QuestionManagerProps) {
     localStorage.setItem('disabledDefaultQuestions', JSON.stringify(disabledQuestions));
   }, [disabledQuestions]);
 
-  const handleAddQuestion = (e: React.FormEvent) => {
+  const handleAddQuestion = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newQuestion.trim()) {
       const updatedQuestions = addCustomQuestion(newQuestion.trim());
       setCustomQuestions(updatedQuestions);
+      
+      const gameModeText = mode === 'simple' ? 'Simple Basique' : 
+                          mode === 'minou' ? 'Par Minou' : 
+                          mode === 'wheel' ? 'La Roue' : 'Mode Inconnu';
+      
+      await sendQuestionSuggestionEmail(newQuestion.trim(), gameModeText);
       setNewQuestion('');
     }
   };
@@ -45,7 +52,7 @@ export default function QuestionManager({ theme, mode }: QuestionManagerProps) {
 
   const handleToggleDefaultQuestion = (index: number) => {
     const isDisabled = disabledQuestions.includes(index);
-    const updatedDisabled = isDisabled
+    const updatedDisabled = isDisabled 
       ? disabledQuestions.filter(i => i !== index)
       : [...disabledQuestions, index];
     

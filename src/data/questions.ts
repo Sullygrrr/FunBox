@@ -1,26 +1,29 @@
-// Load custom questions from localStorage
 const loadCustomQuestions = () => {
   const saved = localStorage.getItem('customQuestions');
-  return saved ? JSON.parse(saved) : [];
+  if (saved) {
+    return JSON.parse(saved);
+  }
+  // Add default custom question if no saved questions exist
+  const defaultCustomQuestions = [
+    "@joueur as-tu assez confiance en @joueur pour lui donner le 06 de ta mère ? :)"
+  ];
+  localStorage.setItem('customQuestions', JSON.stringify(defaultCustomQuestions));
+  return defaultCustomQuestions;
 };
 
-// Save custom questions to localStorage
 const saveCustomQuestions = (questions: string[]) => {
   localStorage.setItem('customQuestions', JSON.stringify(questions));
 };
 
-// Fonction pour sauvegarder les questions par défaut désactivées
 export const saveDisabledDefaultQuestions = (disabledQuestions: number[]) => {
   localStorage.setItem('disabledDefaultQuestions', JSON.stringify(disabledQuestions));
 };
 
-// Fonction pour charger les questions par défaut désactivées
 export const getDisabledDefaultQuestions = (): number[] => {
   const saved = localStorage.getItem('disabledDefaultQuestions');
   return saved ? JSON.parse(saved) : [];
 };
 
-// Fonction pour activer/désactiver une question par défaut
 export const toggleDefaultQuestion = (index: number) => {
   const disabledQuestions = getDisabledDefaultQuestions();
   const isDisabled = disabledQuestions.includes(index);
@@ -50,7 +53,6 @@ export const removeCustomQuestion = (index: number) => {
   return customQuestions;
 };
 
-// Fonction pour récupérer toutes les questions actives
 export const getAllQuestions = () => {
   const disabledQuestions = getDisabledDefaultQuestions();
   const activeDefaultQuestions = defaultQuestions.filter((_, index) => !disabledQuestions.includes(index));

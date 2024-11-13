@@ -157,6 +157,7 @@ export default function App() {
               >
                 {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
               </button>
+
               {players.length > 0 ? (
                 <div className="grid grid-cols-1 gap-3 mb-6">
                   {players.map((player, index) => (
