@@ -21,6 +21,7 @@ export default function App() {
   const [gameMode, setGameMode] = useState<GameMode | null>(null);
   const [audioPlayed, setAudioPlayed] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     const lockOrientation = async () => {
@@ -38,14 +39,27 @@ export default function App() {
       const audio = new Audio(musique);
       audio.loop = true;
       audio.volume = isMuted ? 0 : 1;
+      setAudioElement(audio);
 
       audio.play().catch((error) => {
         console.log('Erreur lors de la lecture de la musique de fond :', error);
       });
 
+      // Gestion de la visibilité de la page
+      const handleVisibilityChange = () => {
+        if (document.hidden) {
+          audio.pause();
+        } else if (!isMuted) {
+          audio.play().catch(console.error);
+        }
+      };
+
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+
       return () => {
         audio.pause();
         audio.currentTime = 0;
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
       };
     }
   }, [audioPlayed, isMuted]);
@@ -59,6 +73,13 @@ export default function App() {
 
   const toggleMute = () => {
     setIsMuted(!isMuted);
+    if (audioElement) {
+      if (isMuted) {
+        audioElement.play().catch(console.error);
+      } else {
+        audioElement.pause();
+      }
+    }
   };
 
   const addPlayer = (player: Player) => {
