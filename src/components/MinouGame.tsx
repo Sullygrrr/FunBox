@@ -366,6 +366,15 @@ export default function MinouGame({ players, onEndGame, theme }: MinouGameProps)
                     <span className="font-medium text-gray-800">{player.name}</span>
                   </button>
                 ))}
+                <div className="flex gap-4">
+            <button
+              onClick={onEndGame}
+              className="flex items-center gap-2 px-6 py-3 border rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <Home className="w-5 h-5" />
+              Quitter
+            </button>
+          </div>
               </div>
             </>
           ) : (

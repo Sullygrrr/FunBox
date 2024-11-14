@@ -509,6 +509,15 @@ export default function MimeGame({ players, onEndGame, theme }: MimeGameProps) {
                 </div>
               </div>
             </div>
+            <div className="flex gap-4">
+            <button
+              onClick={onEndGame}
+              className="flex items-center gap-2 px-6 py-3 border rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <Home className="w-5 h-5" />
+              Quitter
+            </button>
+          </div>
           </div>
         </div>
       );
@@ -560,6 +569,13 @@ export default function MimeGame({ players, onEndGame, theme }: MimeGameProps) {
                     ))}
                 </div>
               </div>
+                          <button
+              onClick={onEndGame}
+              className="flex items-center gap-2 px-6 py-3 border rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <Home className="w-5 h-5" />
+              Quitter
+            </button>
             </div>
           </div>
         </div>
@@ -776,7 +792,7 @@ export default function MimeGame({ players, onEndGame, theme }: MimeGameProps) {
             >
               <Home className="w-5 h-5" />
               Fin du jeu
-            </button> ```jsx
+            </button>
             <button
               onClick={() => {
                 setGamePhase('setup');
