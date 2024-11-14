@@ -76,7 +76,7 @@ export default function App() {
     if (timeDiff < 500) { // 500ms between clicks
       setClickCount(prev => prev + 1);
       if (clickCount === 2) { // This will be the third click
-        const mailtoLink = "mailto:sully@lafunbox.fun?subject=Message depuis la FunBox&body=On joue à la FunBox et on t'envoie ce message en direct de notre soirée (hesitez pas à mettre des photos :) Merci à vous !!!)";
+        const mailtoLink = "mailto:sully@lafunbox.fun?subject=Message depuis la FunBox&body= (Vous pouvez m'envoyer des messages perso, des photos de vos soirées ici ^^)";
         window.location.href = mailtoLink;
         setClickCount(0);
       }
@@ -171,8 +171,9 @@ export default function App() {
             onClick={handleHeaderClick}
           >
             FunBox
-          </h1>
-        </header>
+            </h1>
+  <span className="absolute bottom-1 right-5 text-xs text-white/50">v1.7.9-beta</span> {/* Version en petit */}
+</header>
         {!gameStarted ? (
           <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-6">
             <div className="mb-6">
@@ -254,16 +255,21 @@ export default function App() {
         ) : (
           renderGame()
         )}
-      </div>
-      <footer className="fixed bottom-0 left-0 right-0 py-4 px-4">
-        <div className="container mx-auto flex justify-center items-center gap-4 text-xs text-white/70">
-          <a href="https://www.instagram.com/sully.grrr/" className="hover:text-white transition-colors">@Sully.grrr</a>
-          <span>•</span>
-          <a href="https://www.paypal.me/lafunbox" className="hover:text-white transition-colors">Soutenir le dev</a>
-          <span>•</span>
-          <a href="https://fr.wikipedia.org/wiki/Fun" className="hover:text-white transition-colors">Fun</a>
-        </div>
-      </footer>
+</div>
+<footer className="fixed bottom-0 left-0 right-0 py-4 px-4">
+  <div className="container mx-auto flex justify-center items-center gap-4 text-xs text-white/70">
+    <a href="https://www.instagram.com/sully.grrr/" className="hover:text-white transition-colors">@Sully.grrr</a>
+    <span>•</span>
+    <a href="https://www.paypal.me/lafunbox" className="hover:text-white transition-colors">Soutenir le dev</a>
+    <span>•</span>
+    <a
+      href="mailto:sully@lafunbox.fun?subject=Suggestion pour la FunBox&body= "
+      className="hover:text-white transition-colors"
+    >
+      M'envoyer un Mail
+    </a>
+  </div>
+</footer>
     </div>
   );
 }
