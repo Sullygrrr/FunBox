@@ -21,15 +21,15 @@ export default {
           '100%': { backgroundPosition: '-200% 0' }
         },
         'scroll-diagonal': {
-          '0%': { transform: 'translateX(0%) translateY(-50%)' },
-          '100%': { transform: 'translateX(-50%) translateY(0%)' }
+          '0%': { transform: 'translateX(-50%) translateY(-0%)' },
+          '100%': { transform: 'translateX(-100%) translateY(100%)' }
         }
       },
       animation: {
         'fade-in': 'fade-in 0.5s ease-out forwards',
         'fade-in-out': 'fade-in-out 4s ease-in-out infinite',
         'shimmer': 'shimmer 3s ease-in-out infinite',
-        'scroll-diagonal': 'scroll-diagonal 20s linear infinite'
+        'scroll-diagonal': 'scroll-diagonal 25s linear infinite'
       },
     },
   },

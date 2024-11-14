@@ -148,7 +148,7 @@ export default function App() {
       {showPopup && <SafetyPopup onClose={closePopup} theme={theme} />}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 animate-scroll-diagonal">
-          {Array.from({ length: 12 }).map((_, i) => (
+          {Array.from({ length: 30 }).map((_, i) => (
             <div
               key={i}
               className="whitespace-nowrap text-6xl font-bold opacity-0 mb-24 animate-fade-in-out"
@@ -157,7 +157,7 @@ export default function App() {
                 animationDelay: `${i * 0.2}s`
               }}
             >
-              {Array.from({ length: 8 }).map((_, j) => (
+              {Array.from({ length: 30 }).map((_, j) => (
                 <span key={j} className="mr-12">FunBox -</span>
               ))}
             </div>
