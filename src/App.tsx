@@ -172,7 +172,7 @@ export default function App() {
           >
             FunBox
             </h1>
-  <span className="absolute bottom-1 right-5 text-xs text-white/50">v1.7.10-beta</span> {/* Version en petit */}
+  <span className="absolute bottom-1 right-5 text-xs text-white/50">v1.8.1-beta</span> {/* Version en petit */}
 </header>
         {!gameStarted ? (
           <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-6">
