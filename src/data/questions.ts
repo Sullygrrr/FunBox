@@ -357,7 +357,6 @@ export const defaultQuestions = [
 "Tu préfères avoir une journée entière sans internet ou pour 100€ de plus ? 💻",
 "Quel est le prix minimum pour que tu dises à tout le monde que tu as menti sur ta bio Tinder ? 😏",
 "Pour combien d'euros tu irais à un rendez-vous galant avec @joueur, même si tu n'en avais pas envie ? 💸",
-"Tu préfères vivre sans ton téléphone pendant 6 mois ou recevoir 200€ en échange ? 📱",
 "Combien d’argent il te faudrait pour t’empêcher de parler pendant une heure complète ? 🤐",
 "Pour combien d’euros tu accepterais de porter une perruque ridicule toute une journée ? 💇‍♂️",
 "Combien d'euros minimum tu accepterais de vivre un mois sans télé ? 📺",
@@ -369,7 +368,7 @@ export const defaultQuestions = [
 "Pour combien d’euros tu irais faire du shopping en portant des habits démodés toute la journée ? 🛍️",
 "À quel prix minimum tu serais prêt à crier devant tout le monde que tu as raté un examen ? 📚",
 "Tu préfères te lever à 5h du matin pour une course ou recevoir 200€ en compensation ? 🏃",
-"Combien de shots tu prendrais pour 50€ de plus ? 🍹",
+"Combien de shots tu prendrais pour 50€ là maintenant ? 🍹",
 "Combien de fois tu pourrais regarder une série que tu détestes pour 200€ ? 📺",
 "Pour combien d’euros tu accepterais de marcher en pyjama en public pendant une heure ? 🛌",
 "Combien de minutes tu pourrais rester dans une pièce avec un clown pour 100€ ? 🤡",
@@ -429,6 +428,22 @@ export const defaultQuestions = [
 "Pour combien tu accepterais de faire une séance de méditation en plein milieu d'une rue passante, torse nu ? 🧘",
 "Pour combien tu irais faire une blague particulièrement humiliante à @joueur en public, sachant qu’il/elle pourrait se fâcher ? 🤭",
 "Pour combien tu accepterais de perdre 5 ans de ta vie dans une maison totalement isolée, sans technologie et sans communication ? 🏡",
+
+"Cul sec pour tout le monde ! 🍻",
+"Cul sec pour tout le monde sauf @joueur. 😏",
+"Moi je dis : Petit shot ? 😊",
+"Le dernier qui se lève boit autant de gorgées qu’il y a de joueurs autour de la table. 🍹",
+"@joueur, t’as pas un peu soif ? Tu finirais pas ton verre ? 🍺",
+"Si ton verre est à plus de la moitié, bois assez pour qu’il ne le soit plus. On compte sur toi ! ⬇️",
+"Si ton verre est à moins de la moitié, vide-le, on va pas t’attendre ! 😏",
+"@joueur et @joueur : Celui ou celle d’entre vous qui a le verre le plus rempli le termine. Que le/la meilleur(e) gagne ! ⚔️",
+"Allez hop, tout le monde boit ! 🎉",
+"Le premier qui fini son verre à partir de maintenant distribue un cul sec à qui il veut ! 🥂",
+"Bon, @joueur, distribue 5 gorgées juste parce que t’es trop swag. 😎",
+"Les couples autour de la table, trinquez et buvez un coup, vous êtes trop chiants avec vos étoiles dans les yeux ! 😍",
+"Les couples distribuent autant de gorgées qu’ils ont d’années passées ensemble !💑",
+"STOP ! PLUS PERSONNE BOUGE ! On éli un joueur parmis nous qui doit boire son verre. (désolé si t'as pas eu le temps de le diluer 💀)"
+
 
 
 
