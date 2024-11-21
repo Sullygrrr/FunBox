@@ -429,6 +429,36 @@ export const defaultQuestions = [
 "Pour combien tu irais faire une blague particulièrement humiliante à @joueur en public, sachant qu’il/elle pourrait se fâcher ? 🤭",
 "Pour combien tu accepterais de perdre 5 ans de ta vie dans une maison totalement isolée, sans technologie et sans communication ? 🏡",
 
+
+
+"Les surnoms que tu peux donner à ta b*** 🍆",
+"Un mot en 'ouille', celui qui ne trouve pas ou répète boit (je commence : Couille !) 😂",
+"Les insultes inventées qui font rire, celui qui ne trouve pas ou répète boit 🤪",
+"Les trucs qu'on ne voudrait pas que nos parents trouvent sous notre lit 🙈",
+"Les sons qu'on peut faire avec la bouche, celui qui ne trouve pas ou répète boit (paf, prout...) 🥴",
+"Les excuses bidons pour ne pas aller au sport, celui qui ne trouve pas ou répète boit 🏋️‍♂️",
+"Les pires phrases de drague entendues, celui qui ne trouve pas ou répète boit 💘",
+"Les objets improbables qu’on pourrait utiliser pour boire une bière 🍺",
+"Les trucs qu'on pourrait crier en pleine rue pour gêner les gens autour 🤷‍♂️",
+"Les noms d’animaux qu’on donnerait à un ex toxique 🐍",
+"Les pires costumes de soirée qu’on peut imaginer 🎭",
+"Les noms de cocktails inventés complètement WTF 🍹",
+"Les choses qu'on pourrait dire à son boss pour se faire virer direct 💼",
+"Les paroles de chansons qu’on a toujours mal comprises 🎶",
+"Les films ou séries où les personnages devraient juste se taire 🤫",
+"Les pires trucs qu’un invité pourrait ramener à une soirée 🎁",
+"Les pires secrets qu’on pourrait avouer après trois verres 🤐",
+"Les choses qu'on pourrait écrire sur Tinder pour être sûr de ne jamais matcher 📱",
+"Les lieux où tu ne voudrais jamais être surpris tout nu 😳",
+"Les pires surnoms qu'on pourrait donner à ses amis 🐒",
+"Les pires idées pour un tatouage qu’on regretterait le lendemain 🎨",
+"Les excuses pour ne pas payer un verre à quelqu’un (je commence : J’ai oublié mon portefeuille) 💸",
+"Les sons d’animaux qu’on pourrait imiter en soirée 🐄",
+"Les phrases qu’on pourrait sortir en plein rêve bizarre 🛌",
+"Les prénoms qu’on donnerait à un poisson rouge en pleine crise existentielle 🐟",
+
+
+
 "Cul sec pour tout le monde ! 🍻",
 "Cul sec pour tout le monde sauf @joueur. 😏",
 "Moi je dis : Petit shot ? 😊",
@@ -442,7 +472,10 @@ export const defaultQuestions = [
 "Bon, @joueur, distribue 5 gorgées juste parce que t’es trop swag. 😎",
 "Les couples autour de la table, trinquez et buvez un coup, vous êtes trop chiants avec vos étoiles dans les yeux ! 😍",
 "Les couples distribuent autant de gorgées qu’ils ont d’années passées ensemble !💑",
-"STOP ! PLUS PERSONNE BOUGE ! On éli un joueur parmis nous qui doit boire son verre. (désolé si t'as pas eu le temps de le diluer 💀)"
+"STOP ! PLUS PERSONNE BOUGE ! On éli un joueur parmis nous qui doit boire son verre. (désolé si t'as pas eu le temps de le diluer 💀)",
+"MORT SUBITE : @joueur tu tape une gorgé dans le verre de chaque participant (déso)",
+"@joueur et @joueur on échange les verres.",
+"Tout le monde passe son verre à la personne à sa gauche. C'est kdo !"
 
 
 
