@@ -473,7 +473,11 @@ export const defaultQuestions = [
 "STOP ! PLUS PERSONNE BOUGE ! On éli un joueur parmis nous qui doit boire son verre. (désolé si t'as pas eu le temps de le diluer 💀)",
 "MORT SUBITE : @joueur tu tape une gorgé dans le verre de chaque participant (déso)",
 "@joueur et @joueur on échange les verres.",
-"Tout le monde passe son verre à la personne à sa gauche. C'est kdo !"
+"Tout le monde passe son verre à la personne à sa gauche. C'est kdo !",
+
+"Demain tu touches 1Mrd d'€, qui est le seul joueur à qui tu donnes des talles ? 💶",
+"Demain tu touches 1Mrd d'€, qui est le seul joueur à qui tu ne donnes pas de talles ? 💶",
+"Les chauves, désolé pour vous, fallait avoir des ch'veux, bois autant de gorgées que de nombre de poil sur ton caillou (sois 10 quoi) 💀",
 
 
 
