@@ -172,7 +172,19 @@ export default function App() {
           >
             FunBox
             </h1>
-  <span className="absolute bottom-1 right-5 text-xs text-white/50">v1.8.1b</span> {/* Version en petit */}
+  <span className="absolute bottom-1 right-5 text-xs text-white/50">v1.9b</span> {/* Version en petit */}
+  <div className="container mx-auto flex justify-center items-center gap-4 text-xs text-white/70">
+    <a href="https://www.instagram.com/sully.grrr/" className="hover:text-white transition-colors">@Sully.grrr</a>
+    <span>•</span>
+    <a href="https://www.paypal.me/lafunbox" className="hover:text-white transition-colors">Soutenir le dev</a>
+    <span>•</span>
+    <a
+      href="mailto:sully@lafunbox.fun?subject=Suggestion pour la FunBox&body= "
+      className="hover:text-white transition-colors"
+    >
+      M'envoyer un Mail
+    </a>
+  </div>
 </header>
         {!gameStarted ? (
           <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-6">
@@ -256,20 +268,6 @@ export default function App() {
           renderGame()
         )}
 </div>
-<footer className="fixed bottom-0 left-0 right-0 py-4 px-4">
-  <div className="container mx-auto flex justify-center items-center gap-4 text-xs text-white/70">
-    <a href="https://www.instagram.com/sully.grrr/" className="hover:text-white transition-colors">@Sully.grrr</a>
-    <span>•</span>
-    <a href="https://www.paypal.me/lafunbox" className="hover:text-white transition-colors">Soutenir le dev</a>
-    <span>•</span>
-    <a
-      href="mailto:sully@lafunbox.fun?subject=Suggestion pour la FunBox&body= "
-      className="hover:text-white transition-colors"
-    >
-      M'envoyer un Mail
-    </a>
-  </div>
-</footer>
     </div>
   );
 }

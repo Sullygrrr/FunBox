@@ -6,8 +6,7 @@ import { getRandomPunishmentLevel } from '../utils/punishments';
 import { Theme } from '../types/theme';
 import { QuestionDisplay } from './GameScreen/QuestionDisplay';
 import QuestionManager from './QuestionManager';
-import buttonSoundFile from '../assets/button-sound.mp3'; // Son du bouton
-
+import buttonSoundFile from '../assets/button-sound.mp3';
 
 interface GameScreenProps {
   players: Player[];
@@ -24,9 +23,8 @@ export default function GameScreen({ players, onEndGame, theme }: GameScreenProp
   const [usedQuestions, setUsedQuestions] = useState<string[]>([]);
   const buttonSound = new Audio(buttonSoundFile);
 
-  // Fonction pour jouer le son du bouton
   const playButtonSound = () => {
-    buttonSound.currentTime = 0; // Redémarre le son au début
+    buttonSound.currentTime = 0;
     buttonSound.play();
   };
 
@@ -97,23 +95,25 @@ export default function GameScreen({ players, onEndGame, theme }: GameScreenProp
       <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-8">
         <div className="mb-8">
           <div className="flex justify-between items-center mb-6">
-            <div className="flex gap-2">
-              {players.map((player, index) => (
-                <div
-                  key={index}
-                  className="flex flex-col items-center"
-                >
+            <div className="flex-1 overflow-x-auto scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              <div className="flex gap-4 min-w-min pr-4">
+                {players.map((player, index) => (
                   <div
-                    className="w-8 h-8 rounded-full mb-1"
-                    style={{ backgroundColor: player.color }}
-                  />
-                  <span className="text-sm font-medium text-gray-700">{player.name}</span>
-                </div>
-              ))}
+                    key={index}
+                    className="flex flex-col items-center flex-shrink-0"
+                  >
+                    <div
+                      className="w-8 h-8 rounded-full mb-1"
+                      style={{ backgroundColor: player.color }}
+                    />
+                    <span className="text-sm font-medium text-gray-700 whitespace-nowrap">{player.name}</span>
+                  </div>
+                ))}
+              </div>
             </div>
             <button
               onClick={() => setShowSettings(!showSettings)}
-              className="p-2 text-gray-500 hover:text-gray-700 transition-colors"
+              className="p-2 text-gray-500 hover:text-gray-700 transition-colors flex-shrink-0 ml-4"
             >
               <Settings className="w-5 h-5" />
             </button>
