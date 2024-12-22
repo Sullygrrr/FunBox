@@ -11,6 +11,7 @@ import QuestionManager from './components/QuestionManager';
 import SafetyPopup from './components/SafetyPopup';
 import { useTheme } from './hooks/useTheme';
 import { useSafetyPopup } from './hooks/useSafetyPopup';
+import { usePlayers } from './hooks/usePlayers';
 import { Player, GameMode } from './types';
 import musique from './assets/musique.mp3';
 import buttonSoundFile from './assets/button-sound.mp3';
@@ -18,7 +19,7 @@ import buttonSoundFile from './assets/button-sound.mp3';
 export default function App() {
   const theme = useTheme();
   const { showPopup, closePopup } = useSafetyPopup();
-  const [players, setPlayers] = useState<Player[]>([]);
+  const { players, addPlayer, removePlayer, clearPlayers } = usePlayers();
   const [gameStarted, setGameStarted] = useState(false);
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -73,10 +74,10 @@ export default function App() {
     const currentTime = new Date().getTime();
     const timeDiff = currentTime - lastClickTime;
     
-    if (timeDiff < 500) { // 500ms between clicks
+    if (timeDiff < 500) {
       setClickCount(prev => prev + 1);
-      if (clickCount === 2) { // This will be the third click
-        const mailtoLink = "mailto:sully@lafunbox.fun?subject=Message depuis la FunBox&body= (Vous pouvez m'envoyer des messages perso, des photos de vos soirées ici ^^)";
+      if (clickCount === 2) {
+        const mailtoLink = "mailto:sully@lafunbox.fun?subject=Message depuis la FunBox&body=On joue à la FunBox et on t'envoie ce message en direct de notre soirée (hesitez pas à mettre des photos :) Merci à vous !!!)";
         window.location.href = mailtoLink;
         setClickCount(0);
       }
@@ -104,14 +105,14 @@ export default function App() {
     }
   };
 
-  const addPlayer = (player: Player) => {
-    setPlayers([...players, player]);
+  const handleAddPlayer = (player: Player) => {
+    addPlayer(player);
     setShowAddPlayer(false);
     playButtonSound();
   };
 
-  const removePlayer = (index: number) => {
-    setPlayers(players.filter((_, i) => i !== index));
+  const handleRemovePlayer = (index: number) => {
+    removePlayer(index);
     playButtonSound();
   };
 
@@ -171,21 +172,8 @@ export default function App() {
             onClick={handleHeaderClick}
           >
             FunBox
-            </h1>
-  <span className="absolute bottom-1 right-5 text-xs text-white/50">v1.9b</span> {/* Version en petit */}
-  <div className="container mx-auto flex justify-center items-center gap-4 text-xs text-white/70">
-    <a href="https://www.instagram.com/sully.grrr/" className="hover:text-white transition-colors">@Sully.grrr</a>
-    <span>•</span>
-    <a href="https://www.paypal.me/lafunbox" className="hover:text-white transition-colors">Soutenir le dev</a>
-    <span>•</span>
-    <a
-      href="mailto:sully@lafunbox.fun?subject=Suggestion pour la FunBox&body= "
-      className="hover:text-white transition-colors"
-    >
-      M'envoyer un Mail
-    </a>
-  </div>
-</header>
+          </h1>
+        </header>
         {!gameStarted ? (
           <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-6">
             <div className="mb-6">
@@ -205,7 +193,7 @@ export default function App() {
 
               {showAddPlayer && (
                 <PlayerSetup 
-                  onAdd={addPlayer} 
+                  onAdd={handleAddPlayer} 
                   onCancel={() => setShowAddPlayer(false)}
                   usedColors={usedColors}
                   usedNames={usedNames}
@@ -213,8 +201,7 @@ export default function App() {
                 />
               )}
               <button
-                onClick={() => {toggleMute();
-                  playButtonSound()}}
+                onClick={() => {toggleMute(); playButtonSound()}}
                 className={`fixed bottom-2 right-2 text-white p-2 rounded-full ${theme.primary} ${theme.hover} z-20`}
               >
                 {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
@@ -238,7 +225,7 @@ export default function App() {
                       <span className="flex-1 font-medium text-gray-700">{player.name}</span>
                       <span className="text-sm text-gray-500">{player.punishment}</span>
                       <button
-                        onClick={() => { removePlayer(index); playButtonSound(); }}
+                        onClick={() => { handleRemovePlayer(index); }}
                         className="text-red-500 hover:text-red-700 transition-colors"
                       >
                         ×
@@ -267,7 +254,16 @@ export default function App() {
         ) : (
           renderGame()
         )}
-</div>
+      </div>
+      <footer className="fixed bottom-0 left-0 right-0 py-4 px-4">
+        <div className="container mx-auto flex justify-center items-center gap-4 text-xs text-white/70">
+          <a href="https://www.instagram.com/sully.grrr/" className="hover:text-white transition-colors">@Sully.grrr</a>
+          <span>•</span>
+          <a href="https://www.paypal.me/lafunbox" className="hover:text-white transition-colors">Soutenir le dev</a>
+          <span>•</span>
+          <a href="https://fr.wikipedia.org/wiki/Fun" className="hover:text-white transition-colors">Fun</a>
+        </div>
+      </footer>
     </div>
   );
 }

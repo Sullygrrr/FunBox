@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { PlusCircle, Settings, Home, Timer, Trophy, ArrowRight, Check, X, Users, User } from 'lucide-react';
 import { Player, Team, TimeLimit } from '../types';
 import { Theme } from '../types/theme';
-import { getAllMimeWords } from '../data/mimeWords';
+import { useMimeWords } from '../hooks/useMimeWords';
 import { generateTeamName } from '../data/teamNames';
 import MimeWordManager from './MimeWordManager';
 import buttonSoundFile from '../assets/button-sound.mp3';
@@ -25,7 +25,6 @@ export default function MimeGame({ players, onEndGame, theme }: MimeGameProps) {
   const [selectedMimer, setSelectedMimer] = useState<Player | null>(null);
   const [roundNumber, setRoundNumber] = useState(1);
   const [currentWords, setCurrentWords] = useState<{ word: string; guessed: boolean; skipped: boolean }[]>([]);
-  const [usedWords, setUsedWords] = useState<string[]>([]);
   const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [soloPlayers, setSoloPlayers] = useState<Player[]>([]);
@@ -44,6 +43,16 @@ export default function MimeGame({ players, onEndGame, theme }: MimeGameProps) {
     return randomPlayer.name;
   }, [players]);
 
+  const { getNextWord } = useMimeWords(getRandomPlayer);
+
+  const getRandomWords = useCallback((count: number) => {
+    return Array.from({ length: count }, () => ({
+      word: getNextWord(),
+      guessed: false,
+      skipped: false
+    }));
+  }, [getNextWord]);
+
   const initializeSoloGame = () => {
     setSoloPlayers(players.map(player => ({ ...player, points: 0 })));
     selectNextSoloMimer();
@@ -60,7 +69,7 @@ export default function MimeGame({ players, onEndGame, theme }: MimeGameProps) {
     if (!selectedMimer) return;
     
     setTimeLeft(timeLimit);
-    const newWord = getRandomWords(1)[0].word;
+    const newWord = getNextWord();
     setCurrentWord(newWord);
     setCurrentMimer(selectedMimer);
     
@@ -111,22 +120,6 @@ export default function MimeGame({ players, onEndGame, theme }: MimeGameProps) {
     });
 
     setTeams(newTeams);
-  };
-
-  const getRandomWords = (count: number) => {
-    const allWords = getAllMimeWords(getRandomPlayer);
-    const availableWords = allWords.filter(word => !usedWords.includes(word));
-    if (availableWords.length < count) {
-      setUsedWords([]);
-      return allWords
-        .sort(() => Math.random() - 0.5)
-        .slice(0, count)
-        .map(word => ({ word, guessed: false, skipped: false }));
-    }
-    return availableWords
-      .sort(() => Math.random() - 0.5)
-      .slice(0, count)
-      .map(word => ({ word, guessed: false, skipped: false }));
   };
 
   const startTeamTurn = () => {
@@ -509,15 +502,6 @@ export default function MimeGame({ players, onEndGame, theme }: MimeGameProps) {
                 </div>
               </div>
             </div>
-            <div className="flex gap-4">
-            <button
-              onClick={onEndGame}
-              className="flex items-center gap-2 px-6 py-3 border rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <Home className="w-5 h-5" />
-              Quitter
-            </button>
-          </div>
           </div>
         </div>
       );
@@ -569,13 +553,6 @@ export default function MimeGame({ players, onEndGame, theme }: MimeGameProps) {
                     ))}
                 </div>
               </div>
-                          <button
-              onClick={onEndGame}
-              className="flex items-center gap-2 px-6 py-3 border rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <Home className="w-5 h-5" />
-              Quitter
-            </button>
             </div>
           </div>
         </div>
@@ -798,7 +775,6 @@ export default function MimeGame({ players, onEndGame, theme }: MimeGameProps) {
                 setGamePhase('setup');
                 setIsTeamMode(null);
                 setRoundNumber(1);
-                setUsedWords([]);
                 setCurrentMimer(null);
                 setSelectedMimer(null);
                 setTeams([]);
@@ -806,7 +782,7 @@ export default function MimeGame({ players, onEndGame, theme }: MimeGameProps) {
                 setRoundsPlayed(0);
                 playButtonSound();
               }}
-              className={`flex-1 flex items-center justify-center gap-2 text-white py-3 rounded-lg transition-colors ${theme.primary} ${theme.hover}`}
+              className={`flex-1 flex items-center justify-center gap-2 text-white py-3 rounded-lg transition-colors ${theme.primary} ${theme .hover}`}
             >
               Nouvelle partie
             </button>
