@@ -1,17 +1,13 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Home, Eye, Settings, Plus, Trash2, Send } from 'lucide-react';
+import { Settings, Home, Eye } from 'lucide-react';
 import { Player } from '../types';
 import { Theme } from '../types/theme';
-import { defaultMinouQuestions } from '../data/minouQuestions';
-import { 
-  getAllMinouQuestions, 
-  addCustomMinouQuestion, 
-  removeCustomMinouQuestion,
-  getCustomMinouQuestions,
-} from '../data/questionManager';
+import { getAllMinouQuestions } from '../data/questionManager';
 import { PUNISHMENT_LEVELS } from '../types/punishments';
 import buttonSoundFile from '../assets/button-sound.mp3';
-import { sendQuestionSuggestionEmail } from '../utils/email';
+import VoteConfirmation from './MinouGame/VoteConfirmation';
+import PlayerVoteList from './MinouGame/PlayerVoteList';
+import QuestionManager from './QuestionManager';
 
 interface MinouGameProps {
   players: Player[];
@@ -19,28 +15,14 @@ interface MinouGameProps {
   theme: Theme;
 }
 
-interface Vote {
-  voter: Player;
-  votedFor: Player;
-}
-
 export default function MinouGame({ players, onEndGame, theme }: MinouGameProps) {
   const [usedQuestions, setUsedQuestions] = useState<string[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState<{ text: string; original: string } | null>(null);
   const [currentVoterIndex, setCurrentVoterIndex] = useState(0);
-  const [votes, setVotes] = useState<Vote[]>([]);
+  const [votes, setVotes] = useState<{ voter: Player; votedFor: Player }[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [newQuestion, setNewQuestion] = useState('');
-  const [customQuestions, setCustomQuestions] = useState(getCustomMinouQuestions());
-  const [submitting, setSubmitting] = useState(false);
-
-  const getRandomPlayer = useCallback((excludePlayer?: Player) => {
-    const availablePlayers = excludePlayer 
-      ? players.filter(p => p !== excludePlayer)
-      : players;
-    return availablePlayers[Math.floor(Math.random() * availablePlayers.length)];
-  }, [players]);
+  const [showVoteConfirmation, setShowVoteConfirmation] = useState(false);
 
   const buttonSound = new Audio(buttonSoundFile);
 
@@ -48,6 +30,13 @@ export default function MinouGame({ players, onEndGame, theme }: MinouGameProps)
     buttonSound.currentTime = 0;
     buttonSound.play();
   };
+
+  const getRandomPlayer = useCallback((excludePlayer?: Player) => {
+    const availablePlayers = excludePlayer 
+      ? players.filter(p => p !== excludePlayer)
+      : players;
+    return availablePlayers[Math.floor(Math.random() * availablePlayers.length)];
+  }, [players]);
 
   const processQuestion = useCallback((question: string) => {
     let processedQuestion = question;
@@ -98,12 +87,18 @@ export default function MinouGame({ players, onEndGame, theme }: MinouGameProps)
   }, [currentQuestion, getNextQuestion]);
 
   const handleVote = (votedFor: Player) => {
-    const newVote: Vote = {
-      voter: players[currentVoterIndex],
-      votedFor
-    };
-    setVotes([...votes, newVote]);
-    setCurrentVoterIndex(currentVoterIndex + 1);
+    setShowVoteConfirmation(true);
+    playButtonSound();
+    
+    setTimeout(() => {
+      const newVote = {
+        voter: players[currentVoterIndex],
+        votedFor
+      };
+      setVotes([...votes, newVote]);
+      setCurrentVoterIndex(currentVoterIndex + 1);
+      setShowVoteConfirmation(false);
+    }, 1000);
   };
 
   const getMostVotedPlayer = () => {
@@ -116,58 +111,25 @@ export default function MinouGame({ players, onEndGame, theme }: MinouGameProps)
       .sort((a, b) => b[1] - a[1])[0];
   };
 
-  const startNewQuestion = () => {
-    setCurrentQuestion(getNextQuestion());
-    setVotes([]);
-    setCurrentVoterIndex(0);
-    setShowResults(false);
-    setShowSettings(false);
-  };
-
-  const handleAddQuestion = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newQuestion.trim()) {
-      const updatedQuestions = addCustomMinouQuestion(newQuestion.trim());
-      setCustomQuestions(updatedQuestions);
-      setNewQuestion('');
-    }
-  };
-
-  const handleRemoveQuestion = (index: number) => {
-    const updatedQuestions = removeCustomMinouQuestion(index);
-    setCustomQuestions(updatedQuestions);
-  };
-
-  const handleSubmitQuestions = async () => {
-    if (customQuestions.length === 0) return;
-    
-    setSubmitting(true);
-    try {
-      await sendQuestionSuggestionEmail(customQuestions.join('\n\n'), 'Mode Par Minou');
-      alert('Questions soumises avec succès !');
-    } catch (error) {
-      console.error('Error submitting questions:', error);
-      alert('Erreur lors de la soumission des questions');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const getPunishmentLevel = () => {
-    return PUNISHMENT_LEVELS[Math.floor(Math.random() * 3) + 3];
-  };
-
-  if (!currentQuestion) return null;
+  if (showSettings) {
+    return (
+      <div className="max-w-3xl mx-auto">
+        <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-8">
+          <QuestionManager theme={theme} mode="minou" />
+        </div>
+      </div>
+    );
+  }
 
   if (showResults) {
     const [winner, voteCount] = getMostVotedPlayer();
     const percentage = Math.round((voteCount / votes.length) * 100);
-    const punishment = getPunishmentLevel();
+    const punishment = PUNISHMENT_LEVELS[Math.floor(Math.random() * 3) + 3];
 
     return (
       <div className="max-w-3xl mx-auto">
         <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-8">
-          <h2 className="text-2xl font-bold text-center mb-6" dangerouslySetInnerHTML={{ __html: currentQuestion.text }} />
+          <h2 className="text-2xl font-bold text-center mb-6" dangerouslySetInnerHTML={{ __html: currentQuestion?.text || '' }} />
           
           <div className="mb-8">
             <div className="flex flex-col items-center gap-4">
@@ -235,7 +197,10 @@ export default function MinouGame({ players, onEndGame, theme }: MinouGameProps)
             </button>
             <button
               onClick={() => {
-                startNewQuestion();
+                setCurrentQuestion(getNextQuestion());
+                setVotes([]);
+                setCurrentVoterIndex(0);
+                setShowResults(false);
                 playButtonSound();
               }}
               className={`flex-1 flex items-center justify-center gap-2 text-white py-3 rounded-lg transition-colors ${theme.primary} ${theme.hover}`}
@@ -248,150 +213,54 @@ export default function MinouGame({ players, onEndGame, theme }: MinouGameProps)
     );
   }
 
-  if (showSettings) {
+  if (currentVoterIndex < players.length) {
     return (
       <div className="max-w-3xl mx-auto">
         <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-8">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold text-gray-800">Gestion des questions</h2>
-            <button
-              onClick={() => setShowSettings(false)}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              ×
-            </button>
-          </div>
-
-          <form onSubmit={handleAddQuestion} className="mb-6">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={newQuestion}
-                onChange={(e) => setNewQuestion(e.target.value)}
-                placeholder="Ajouter une nouvelle question... (@joueur pour un joueur aléatoire)"
-                className={`flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 ${theme.ring}`}
+          <div className="mb-8">
+            <div className="flex justify-between items-center mb-6">
+              <h2 
+                className="text-2xl font-bold text-center flex-1"
+                dangerouslySetInnerHTML={{ __html: currentQuestion?.text || '' }}
               />
               <button
-                type="submit"
-                className={`p-2 rounded-lg text-white ${theme.primary} ${theme.hover}`}
+                onClick={() => setShowSettings(true)}
+                className="p-2 text-gray-500 hover:text-gray-700 transition-colors"
               >
-                <Plus className="w-5 h-5" />
+                <Settings className="w-5 h-5" />
               </button>
             </div>
-          </form>
+            
+            <p className="text-center text-gray-600 mb-6">
+              C'est au tour de <span className="font-semibold">{players[currentVoterIndex].name}</span> de voter
+            </p>
 
-          {customQuestions.length > 0 && (
-            <div className="flex justify-end mb-4">
-              <button
-                onClick={handleSubmitQuestions}
-                disabled={submitting}
-                className={`flex items-center gap-2 px-4 py-2 text-white rounded-md transition-colors ${theme.primary} ${theme.hover} disabled:opacity-50`}
-              >
-                <Send className="w-4 h-4" />
-                {submitting ? 'Envoi...' : 'Soumettre les questions au créateur'}
-              </button>
-            </div>
-          )}
-
-          <div className="space-y-4">
-            <div>
-              <h3 className="font-medium text-gray-700 mb-2">Questions par défaut</h3>
-              <div className="space-y-2">
-                {defaultMinouQuestions.map((question, index) => (
-                  <div key={index} className="p-2 bg-gray-50 rounded-lg">
-                    <span className="text-sm text-gray-600">{question}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <h3 className="font-medium text-gray-700 mb-2">Questions personnalisées</h3>
-              <div className="space-y-2">
-                {customQuestions.map((question, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
-                    <span className="text-sm text-gray-600">{question}</span>
-                    <button
-                      onClick={() => handleRemoveQuestion(index)}
-                      className="p-1 text-red-500 hover:text-red-700"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <PlayerVoteList 
+              players={players}
+              currentVoter={players[currentVoterIndex]}
+              onVote={handleVote}
+            />
           </div>
         </div>
+
+        <VoteConfirmation 
+          show={showVoteConfirmation}
+          onAnimationEnd={() => setShowVoteConfirmation(false)}
+        />
       </div>
     );
   }
 
   return (
     <div className="max-w-3xl mx-auto">
-      <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-8">
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-6">
-            <h2 
-              className="text-2xl font-bold text-center"
-              dangerouslySetInnerHTML={{ __html: currentQuestion.text }}
-            />
-            <button
-              onClick={() => setShowSettings(true)}
-              className="p-2 text-gray-500 hover:text-gray-700 transition-colors"
-            >
-              <Settings className="w-5 h-5" />
-            </button>
-          </div>
-          
-          {currentVoterIndex < players.length ? (
-            <>
-              <p className="text-center text-gray-600 mb-6">
-                C'est au tour de <span className="font-semibold">{players[currentVoterIndex].name}</span> de voter
-              </p>
-              <div className="grid grid-cols-2 gap-4">
-                {players.map((player) => (
-                  <button
-                    key={player.name}
-                    onClick={() => {
-                      handleVote(player);
-                      playButtonSound();
-                    }}
-                    className="flex flex-col items-center gap-2 p-4 rounded-xl bg-white shadow-sm hover:shadow-md transition-all"
-                  >
-                    <div
-                      className="w-12 h-12 rounded-full"
-                      style={{ backgroundColor: player.color }}
-                    />
-                    <span className="font-medium text-gray-800">{player.name}</span>
-                  </button>
-                ))}
-                <div className="flex gap-4">
-            <button
-              onClick={onEndGame}
-              className="flex items-center gap-2 px-6 py-3 border rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <Home className="w-5 h-5" />
-              Quitter
-            </button>
-          </div>
-              </div>
-            </>
-          ) : (
-            <div className="text-center">
-              <button
-                onClick={() => {
-                  setShowResults(true);
-                  playButtonSound();
-                }}
-                className={`flex items-center justify-center gap-2 mx-auto px-8 py-3 text-white rounded-lg transition-colors ${theme.primary} ${theme.hover}`}
-              >
-                <Eye className="w-5 h-5" />
-                Voir les résultats
-              </button>
-            </div>
-          )}
-        </div>
+      <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-8 text-center">
+        <button
+          onClick={() => setShowResults(true)}
+          className={`flex items-center justify-center gap-2 mx-auto px-8 py-3 text-white rounded-lg transition-colors ${theme.primary} ${theme.hover}`}
+        >
+          <Eye className="w-5 h-5" />
+          Voir les résultats
+        </button>
       </div>
     </div>
   );
