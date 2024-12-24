@@ -172,8 +172,15 @@ export default function App() {
             onClick={handleHeaderClick}
           >
             FunBox
+            <button
+                onClick={() => {toggleMute(); playButtonSound()}}
+                className={`fixed bottom-2 right-2 text-white p-2 rounded-full ${theme.primary} ${theme.hover} z-20`}
+              >
+                {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+              </button>
           </h1>
-  <span className="absolute bottom-1 right-5 text-xs text-white/50">v1.9b</span> {/* Version en petit */}
+
+  <span className="absolute bottom-1 right-5 text-xs text-white/50">v1.13b</span> {/* Version en petit */}
   <div className="container mx-auto flex justify-center items-center gap-4 text-xs text-white/70">
     <a href="https://www.instagram.com/sully.grrr/" className="hover:text-white transition-colors">@Sully.grrr</a>
     <span>•</span>
@@ -213,13 +220,6 @@ export default function App() {
                   theme={theme}
                 />
               )}
-              <button
-                onClick={() => {toggleMute(); playButtonSound()}}
-                className={`fixed bottom-2 right-2 text-white p-2 rounded-full ${theme.primary} ${theme.hover} z-20`}
-              >
-                {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
-              </button>
-
               {players.length > 0 ? (
                 <div className="grid grid-cols-1 gap-3 mb-6">
                   {players.map((player, index) => (
