@@ -1,5 +1,7 @@
 // Noms pluriels
 const nouns = [
+
+  "Pancartes", 
   // Animaux
   "Écureuils", "Licornes", "Pandas", "Loups", "Chatons",
   
@@ -9,7 +11,7 @@ const nouns = [
   
   // Objets/Concepts
   "Shots", "Verres", "Bières", "Cocktails", "Tequilas",
-  "Capotes", "Strings", "Slips", "Bites", "Nichons",
+  "Capotes", "Strings", "Slips", "Bites", "Nichons", "Boîtes",
   
   // Métiers décalés
   "Stripeurs", "Gigolos", "Escorts", "Masseurs", "Danseurs",
@@ -22,7 +24,7 @@ const nouns = [
 // Adjectifs pluriels
 const adjectives = [
   // Caractéristiques physiques
-  "Sexy", "Musclés", "Chauds", "Bouillants", "Excités",
+  "Sexy", "Musclés", "Chauds", "Bouillants", "Excités", "Grandes",
   
   // États
   "Bourrés", "Défoncés", "Pétés", "Allumés", "Déchaînés",

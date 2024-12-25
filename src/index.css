@@ -20,3 +20,23 @@
     scrollbar-width: none;
   }
 }
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.loading-text-container {
+  display: flex;
+  animation: scroll-left 1s linear infinite;
+}
+
+.loading-text {
+  white-space: nowrap;
+}
+
+

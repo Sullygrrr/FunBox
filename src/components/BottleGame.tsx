@@ -5,6 +5,36 @@ import { Theme } from '../types/theme';
 import bottleImage from '../assets/bottle.png';
 import capImage from '../assets/cap.png';
 import screwImage from '../assets/vis.png';
+import capLoseSoundFile from '../assets/caplose.wav';
+import screwSoundFile1 from '../assets/screwcap-002.wav';
+import screwSoundFile2 from '../assets/screwcap-003.wav';
+import screwSoundFile3 from '../assets/screwcap-004.wav';
+import screwSoundFile4 from '../assets/screwcap-005.wav';
+import screwSoundFile5 from '../assets/screwcap-006.wav';
+import { preloadAssets } from '../utils/preloadAssets';
+import LoadingScreen from './LoadingScreen';
+import GameOverScreen from './GameOverScreen'; // Importation du composant GameOverScreen
+
+const capLoseSound = new Audio(capLoseSoundFile);
+const screwSound1 = new Audio(screwSoundFile1);
+const screwSound2 = new Audio(screwSoundFile2);
+const screwSound3 = new Audio(screwSoundFile3);
+const screwSound4 = new Audio(screwSoundFile4);
+const screwSound5 = new Audio(screwSoundFile5);
+
+const playLoseSound = () => {
+  capLoseSound.currentTime = 0;
+  capLoseSound.play();
+};
+
+const playScrewSound = () => {
+  const screwSounds = [screwSound1, screwSound2, screwSound3, screwSound4, screwSound5];
+  const randomIndex = Math.floor(Math.random() * screwSounds.length);
+  const selectedSound = screwSounds[randomIndex];
+
+  selectedSound.currentTime = 0;
+  selectedSound.play();
+};
 
 interface BottleGameProps {
   players: Player[];
@@ -17,9 +47,31 @@ export default function BottleGame({ players, onEndGame, theme }: BottleGameProp
   const [capOffset, setCapOffset] = useState(-65);
   const [counter, setCounter] = useState(0);
   const [randomNumber, setRandomNumber] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
+  const [gameOver, setGameOver] = useState(false); // Nouvel état pour l'écran de perte
 
   useEffect(() => {
-    // Générez le nombre aléatoire une seule fois au début
+    const assets = {
+      images: [bottleImage, capImage, screwImage],
+      sounds: [
+        capLoseSoundFile,
+        screwSoundFile1,
+        screwSoundFile2,
+        screwSoundFile3,
+        screwSoundFile4,
+        screwSoundFile5
+      ]
+    };
+
+    preloadAssets(assets)
+      .then(() => setLoading(false))
+      .catch((error) => {
+        console.error('Erreur lors du préchargement des assets', error);
+        setLoading(false);
+      });
+  }, []);
+
+  useEffect(() => {
     const generateRandomNumber = () => {
       const randomValue = Math.random();
       if (randomValue < 0.8) return Math.floor(Math.random() * 6); // 80% chance for numbers 0-5
@@ -27,22 +79,25 @@ export default function BottleGame({ players, onEndGame, theme }: BottleGameProp
       return Math.floor(Math.random() * 6) + 11; // 5% chance for numbers 11-20
     };
 
-    // Définit le nombre aléatoire au début du jeu
     setRandomNumber(generateRandomNumber());
-  }, []); // Le tableau vide [] permet de l'exécuter seulement une fois lors du premier rendu
+  }, []);
 
   const handleCapClick = () => {
-    if (counter >= 20) return; // Limite de clics à 20
+    if (counter >= 20 || gameOver) return;
 
     setCapOffset((prev) => prev + 10);
     setScrews((prev) => [...prev, prev.length * 10]);
     setCounter((prev) => prev + 1);
 
     if (counter + 1 === 21 || counter + 1 === randomNumber) {
-      alert("You lost!");
-      onEndGame();
+      playLoseSound();
+      setGameOver(true); // Déclenche l'écran de perte
     }
   };
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col justify-between items-center relative">
@@ -64,7 +119,10 @@ export default function BottleGame({ players, onEndGame, theme }: BottleGameProp
         <img 
           src={capImage} 
           alt="Cap"
-          onClick={handleCapClick}
+          onClick={() => {
+            handleCapClick();
+            playScrewSound();
+          }}         
           className="absolute transform scale-[1.5] cursor-pointer transition-all duration-300"
           style={{ bottom: `${50 + capOffset}px` }}
         />
@@ -83,6 +141,13 @@ export default function BottleGame({ players, onEndGame, theme }: BottleGameProp
           {counter}
         </p>
       </div>
+
+      {gameOver && (
+        <GameOverScreen 
+          message="Perdu..." 
+          onEndGame={onEndGame} 
+        />
+      )}
     </div>
   );
 }
