@@ -6,6 +6,7 @@ import GameScreen from './components/GameScreen';
 import WheelGame from './components/WheelGame';
 import MinouGame from './components/MinouGame';
 import MimeGame from './components/MimeGame';
+import BottleGame from './components/BottleGame';
 import GameModeSelector from './components/GameModeSelector';
 import QuestionManager from './components/QuestionManager';
 import SafetyPopup from './components/SafetyPopup';
@@ -132,6 +133,8 @@ export default function App() {
         return <MimeGame players={players} onEndGame={() => setGameStarted(false)} theme={theme} />;
       case 'wheel':
         return <WheelGame players={players} onEndGame={() => setGameStarted(false)} theme={theme} />;
+      case 'bottle':
+        return <BottleGame players={players} onEndGame={() => setGameStarted(false)} theme={theme} />;
       default:
         return null;
     }
@@ -180,19 +183,19 @@ export default function App() {
               </button>
           </h1>
 
-  <span className="absolute bottom-1 right-5 text-xs text-white/50">v1.13b</span> {/* Version en petit */}
-  <div className="container mx-auto flex justify-center items-center gap-4 text-xs text-white/70">
-    <a href="https://www.instagram.com/sully.grrr/" className="hover:text-white transition-colors">@Sully.grrr</a>
-    <span>•</span>
-    <a href="https://www.paypal.me/lafunbox" className="hover:text-white transition-colors">Soutenir le dev</a>
-    <span>•</span>
-    <a
-      href="mailto:sully@lafunbox.fun?subject=Suggestion pour la FunBox&body= "
-      className="hover:text-white transition-colors"
-    >
-      M'envoyer un Mail
-    </a>
-  </div>
+          <span className="absolute bottom-1 right-5 text-xs text-white/50">v1.15b</span>
+          <div className="container mx-auto flex justify-center items-center gap-4 text-xs text-white/70">
+            <a href="https://www.instagram.com/sully.grrr/" className="hover:text-white transition-colors">@Sully.grrr</a>
+            <span>•</span>
+            <a href="https://www.paypal.me/lafunbox" className="hover:text-white transition-colors">Soutenir le dev</a>
+            <span>•</span>
+            <a
+              href="mailto:sully@lafunbox.fun?subject=Suggestion pour la FunBox&body= "
+              className="hover:text-white transition-colors"
+            >
+              M'envoyer un Mail
+            </a>
+          </div>
         </header>
         {!gameStarted ? (
           <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-6">

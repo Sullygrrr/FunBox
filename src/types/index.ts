@@ -6,7 +6,7 @@ export interface Player {
   points?: number;
 }
 
-export type GameMode = 'simple' | 'minou' | 'mime' | 'wheel';
+export type GameMode = 'simple' | 'minou' | 'mime' | 'wheel' | 'bottle';
 
 export interface GameModeOption {
   id: GameMode;

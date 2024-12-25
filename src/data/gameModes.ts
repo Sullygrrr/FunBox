@@ -24,5 +24,11 @@ export const gameModes: GameModeOption[] = [
     title: 'La rouuuue !',
     emoji: '💀',
     description: 'Que la roue décide de votre sort'
+  },
+  {
+    id: 'bottle',
+    title: 'La Bouteille',
+    emoji: '🍾',
+    description: 'Tu pousses le bouchon un peu trop loin Maurice !'
   }
 ];
