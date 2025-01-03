@@ -32,8 +32,17 @@ export default function GameModeDescription({ mode, onClose, theme }: GameModeDe
     }
   };
 
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
+    <div 
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 select-none" 
+      onClick={handleBackdropClick}
+    >
       <div 
         className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 animate-fade-in"
         onClick={e => e.stopPropagation()}

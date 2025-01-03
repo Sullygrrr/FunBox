@@ -1,20 +1,5 @@
-import emailjs from 'emailjs-com';
-
-export const sendQuestionSuggestionEmail = async (questions: string, gameMode: string) => {
-    try {
-        const templateParams = {
-          subject: `Suggestions de questions - ${gameMode}`,
-          message: `Un utilisateur a soumis ces questions, on valide chef ?\n\n${questions}`,
-          to_email: 'sully@lafunbox.fun'
-        };
-
-    await emailjs.send(
-      'FunBox1',
-      'template_zxtdf1h',
-      templateParams,
-      'cdkst67e4e_Zli_BL'
-    );
-  } catch (error) {
-    console.error('Error sending email:', error);
-  }
+export const createMailtoLink = (content: string, gameMode: string) => {
+  const subject = encodeURIComponent(`Suggestions pour la FunBox - ${gameMode}`);
+  const body = encodeURIComponent(`Voici mes suggestions pour le mode ${gameMode} :\n\n${content}`);
+  return `mailto:sully@lafunbox.fun?subject=${subject}&body=${body}`;
 };

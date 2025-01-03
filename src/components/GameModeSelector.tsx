@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { gameModes } from '../data/gameModes';
 import { GameMode } from '../types';
 import { Theme } from '../types/theme';
@@ -9,29 +9,47 @@ interface GameModeSelectorProps {
   theme: Theme;
 }
 
-let longPressTimer: NodeJS.Timeout;
-
 export default function GameModeSelector({ onSelect, theme }: GameModeSelectorProps) {
   const [showDescription, setShowDescription] = useState<GameMode | null>(null);
+  const longPressTimeoutRef = useRef<NodeJS.Timeout>();
+  const isDraggingRef = useRef(false);
+  const startPosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  const handleTouchStart = (mode: GameMode, e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    startPosRef.current = { x: touch.clientX, y: touch.clientY };
+    isDraggingRef.current = false;
+
+    longPressTimeoutRef.current = setTimeout(() => {
+      if (!isDraggingRef.current) {
+        setShowDescription(mode);
+      }
+    }, 500);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    const deltaX = Math.abs(touch.clientX - startPosRef.current.x);
+    const deltaY = Math.abs(touch.clientY - startPosRef.current.y);
+
+    if (deltaX > 10 || deltaY > 10) {
+      isDraggingRef.current = true;
+      clearTimeout(longPressTimeoutRef.current);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    clearTimeout(longPressTimeoutRef.current);
+  };
 
   const handleMouseDown = (mode: GameMode) => {
-    longPressTimer = setTimeout(() => {
-      setShowDescription(mode);
-    }, 500); // Affiche après 500ms d'appui
-  };
-
-  const handleMouseUp = () => {
-    clearTimeout(longPressTimer);
-  };
-
-  const handleTouchStart = (mode: GameMode) => {
-    longPressTimer = setTimeout(() => {
+    longPressTimeoutRef.current = setTimeout(() => {
       setShowDescription(mode);
     }, 500);
   };
 
-  const handleTouchEnd = () => {
-    clearTimeout(longPressTimer);
+  const handleMouseUp = () => {
+    clearTimeout(longPressTimeoutRef.current);
   };
 
   return (
@@ -40,11 +58,12 @@ export default function GameModeSelector({ onSelect, theme }: GameModeSelectorPr
         <button
           key={mode.id}
           onClick={() => onSelect(mode.id)}
+          onTouchStart={(e) => handleTouchStart(mode.id, e)}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
           onMouseDown={() => handleMouseDown(mode.id)}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
-          onTouchStart={() => handleTouchStart(mode.id)}
-          onTouchEnd={handleTouchEnd}
           className={`bg-white/90 backdrop-blur-sm p-4 rounded-xl shadow-lg hover:bg-white/95 transition-all transform hover:scale-[1.02] active:scale-[0.98] hover:ring-2 ${theme.ring} ring-offset-2`}
         >
           <div className="flex items-center gap-3">
