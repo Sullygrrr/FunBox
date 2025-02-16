@@ -185,7 +185,7 @@ export default function App() {
                   }}
                 >
                   {Array.from({ length: 30 }).map((_, j) => (
-                    <span key={j} className="mr-12">FunBox -</span>
+                    <span key={j} className="mr-12">FunBox ---</span>
                   ))}
                 </div>
               ))}
